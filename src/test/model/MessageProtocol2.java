@@ -1,7 +1,7 @@
-import org.teamapps.protocol.message.MessageDefinition;
-import org.teamapps.protocol.message.MessageModelCollection;
-import org.teamapps.protocol.model.ModelCollection;
-import org.teamapps.protocol.model.ModelCollectionProvider;
+import org.teamapps.message.protocol.message.MessageDefinition;
+import org.teamapps.message.protocol.message.MessageModelCollection;
+import org.teamapps.message.protocol.model.ModelCollection;
+import org.teamapps.message.protocol.model.ModelCollectionProvider;
 
 public class MessageProtocol2 implements ModelCollectionProvider {
 	@Override

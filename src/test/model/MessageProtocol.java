@@ -1,10 +1,10 @@
-import org.teamapps.protocol.message.AttributeType;
-import org.teamapps.protocol.message.MessageDefinition;
-import org.teamapps.protocol.message.MessageModelCollection;
-import org.teamapps.protocol.model.EnumDefinition;
-import org.teamapps.protocol.model.ModelCollection;
-import org.teamapps.protocol.model.ModelCollectionProvider;
-import org.teamapps.protocol.service.ProtocolServiceSchema;
+import org.teamapps.message.protocol.message.AttributeType;
+import org.teamapps.message.protocol.message.MessageDefinition;
+import org.teamapps.message.protocol.message.MessageModelCollection;
+import org.teamapps.message.protocol.model.EnumDefinition;
+import org.teamapps.message.protocol.model.ModelCollection;
+import org.teamapps.message.protocol.model.ModelCollectionProvider;
+import org.teamapps.message.protocol.service.ServiceProtocol;
 
 public class MessageProtocol implements ModelCollectionProvider {
 	@Override
@@ -33,11 +33,12 @@ public class MessageProtocol implements ModelCollectionProvider {
 		company.addSingleReference("ceo", 3, employee);
 		company.addMultiReference("employee", 4, employee);
 		company.addAttribute("picture", 5, AttributeType.FILE);
+		company.addGenericMessageAttribute("embeddedMessage", 6);
 
 		person1.addStringAttribute("name", 1);
 		person1.addStringAttribute("email", 2);
 
-		ProtocolServiceSchema testService = modelCollection.createProtocolServiceSchema("testService");
+		ServiceProtocol testService = modelCollection.createService("testService");
 		testService.addMethod("method1", company, employee);
 
 		return modelCollection;
