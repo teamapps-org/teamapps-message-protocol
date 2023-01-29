@@ -33,10 +33,10 @@ public class MessageProtocol implements ModelCollectionProvider {
 		company.addSingleReference("ceo", 3, employee);
 		company.addMultiReference("employee", 4, employee);
 		company.addAttribute("picture", 5, AttributeType.FILE);
-		company.addGenericMessageAttribute("embeddedMessage", 6);
+		company.addGenericMessage("embeddedMessage", 6);
 
-		person1.addStringAttribute("name", 1);
-		person1.addStringAttribute("email", 2);
+		person1.addString("name", 1);
+		person1.addString("email", 2);
 
 		ServiceProtocol testService = modelCollection.createService("testService");
 		testService.addMethod("method1", company, employee);

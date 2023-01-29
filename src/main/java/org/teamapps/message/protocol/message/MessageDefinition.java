@@ -65,11 +65,11 @@ public class MessageDefinition implements MessageModel {
 		this.messageRecord = messageRecord;
 		this.comment = comment;
 		if (messageRecord) {
-			addIntAttribute(META_RECORD_ID, 16_000);
-			addTimestampAttribute(META_CREATION_DATE, 16_001);
-			addIntAttribute(META_CREATED_BY, 16_002);
-			addTimestampAttribute(META_MODIFICATION_DATE, 16_003);
-			addIntAttribute(META_MODIFIED_BY, 16_004);
+			addInteger(META_RECORD_ID, 16_000);
+			addTimestamp(META_CREATION_DATE, 16_001);
+			addInteger(META_CREATED_BY, 16_002);
+			addTimestamp(META_MODIFICATION_DATE, 16_003);
+			addInteger(META_MODIFIED_BY, 16_004);
 		}
 	}
 
@@ -138,79 +138,79 @@ public class MessageDefinition implements MessageModel {
 		return objectUuid;
 	}
 
-	public void addBooleanAttribute(String name, int key) {
+	public void addBoolean(String name, int key) {
 		addAttribute(name, key, AttributeType.BOOLEAN);
 	}
 
-	public void addByteAttribute(String name, int key) {
+	public void addByte(String name, int key) {
 		addAttribute(name, key, AttributeType.BYTE);
 	}
 
-	public void addStringAttribute(String name, int key) {
+	public void addString(String name, int key) {
 		addAttribute(name, key, AttributeType.STRING);
 	}
 
-	public void addIntAttribute(String name, int key) {
+	public void addInteger(String name, int key) {
 		addAttribute(name, key, AttributeType.INT);
 	}
 
-	public void addLongAttribute(String name, int key) {
+	public void addLong(String name, int key) {
 		addAttribute(name, key, AttributeType.LONG);
 	}
 
-	public void addFloatAttribute(String name, int key) {
+	public void addFloat(String name, int key) {
 		addAttribute(name, key, AttributeType.FLOAT);
 	}
 
-	public void addDoubleAttribute(String name, int key) {
+	public void addDouble(String name, int key) {
 		addAttribute(name, key, AttributeType.DOUBLE);
 	}
 
-	public void addFileAttribute(String name, int key) {
+	public void addFile(String name, int key) {
 		addAttribute(name, key, AttributeType.FILE);
 	}
 
-	public void addByteArrayAttribute(String name, int key) {
+	public void addByteArray(String name, int key) {
 		addAttribute(name, key, AttributeType.BYTE_ARRAY);
 	}
 
-	public void addIntArrayAttribute(String name, int key) {
+	public void addIntArray(String name, int key) {
 		addAttribute(name, key, AttributeType.INT_ARRAY);
 	}
 
-	public void addLongArrayAttribute(String name, int key) {
+	public void addLongArray(String name, int key) {
 		addAttribute(name, key, AttributeType.LONG_ARRAY);
 	}
 
-	public void addFloatArrayAttribute(String name, int key) {
+	public void addFloatArray(String name, int key) {
 		addAttribute(name, key, AttributeType.FLOAT_ARRAY);
 	}
 
-	public void addDoubleArrayAttribute(String name, int key) {
+	public void addDoubleArray(String name, int key) {
 		addAttribute(name, key, AttributeType.DOUBLE_ARRAY);
 	}
 
-	public void addStringArrayAttribute(String name, int key) {
+	public void addStringArray(String name, int key) {
 		addAttribute(name, key, AttributeType.STRING_ARRAY);
 	}
 
-	public void addTimestampAttribute(String name, int key) {
+	public void addTimestamp(String name, int key) {
 		addAttribute(name, key, AttributeType.TIMESTAMP_32);
 	}
 
-	public void addLongTimestampAttribute(String name, int key) {
+	public void addLongTimestamp(String name, int key) {
 		addAttribute(name, key, AttributeType.TIMESTAMP_64);
 	}
 
-	public void addDateTimeAttribute(String name, int key) {
+	public void addDateTime(String name, int key) {
 		addAttribute(name, key, AttributeType.DATE_TIME);
 	}
 
-	public void addDateAttribute(String name, int key) {
+	public void addDate(String name, int key) {
 		addAttribute(name, key, AttributeType.DATE);
 	}
 
-	public void addTimeAttribute(String name, int key) {
+	public void addTime(String name, int key) {
 		addAttribute(name, key, AttributeType.TIME);
 	}
 
@@ -258,7 +258,7 @@ public class MessageDefinition implements MessageModel {
 		addAttribute(referenceAttributeDefinition);
 	}
 
-	public void addGenericMessageAttribute(String name, int key) {
+	public void addGenericMessage(String name, int key) {
 		addAttribute(name, key, AttributeType.GENERIC_MESSAGE);
 	}
 

@@ -12,8 +12,8 @@ public class MessageProtocol2 implements ModelCollectionProvider {
 		MessageDefinition person2 = modelCollection.createModel("person2", "col.person", true);
 
 
-		person2.addStringAttribute("name", 1);
-		person2.addStringAttribute("phone", 4);
+		person2.addString("name", 1);
+		person2.addString("phone", 4);
 
 
 		return modelCollection;
