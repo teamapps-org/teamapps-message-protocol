@@ -8,7 +8,7 @@
 
     <name>TeamApps Message Protocol</name>
     <description>A TeamApps.org protocol and message definition framework</description>
-    <url>https://github.com/teamapps-org/teamapps-cluster</url>
+    <url>https://github.com/teamapps-org/teamapps-message-protocol</url>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -36,16 +36,16 @@
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
     <scm>
-        <url>https://github.com/teamapps-org/teamapps-protocol-schema</url>
+        <url>https://github.com/teamapps-org/teamapps-message-protocol</url>
         <connection>scm:git:git@github.com:teamapps-org/teamapps-message-protocol</connection>
         <developerConnection>scm:git:git@github.com:teamapps-org/teamapps-message-protocol</developerConnection>
         <tag>HEAD</tag>
@@ -78,7 +78,7 @@
             <plugin>
                 <groupId>org.teamapps</groupId>
                 <artifactId>teamapps-message-protocol-maven-plugin</artifactId>
-                <version>0.4-SNAPSHOT</version>
+                <version>0.4</version>
                 <executions>
                     <execution>
                         <phase>generate-test-sources</phase>
@@ -121,7 +121,7 @@
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
