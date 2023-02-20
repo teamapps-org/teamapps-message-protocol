@@ -37,6 +37,11 @@ public class MessageProtocol implements ModelCollectionProvider {
 		EnumDefinition employeeType = modelCollection.createEnum("employeeType", "fullTime", "partTime", "seasonal", "temporary");
 		EnumDefinition gender = modelCollection.createEnum("gender", "male", "female", "diverse");
 
+		MessageDefinition xmlTest = modelCollection.createModel("xmlTest", "col.xmlTest", true);
+		xmlTest.addAttribute("intVal", 1, AttributeType.INT, null, "900", "This is a comment");
+		xmlTest.addAttribute("intVal2", 2, AttributeType.INT, null, "123", null);
+		xmlTest.addAttribute("stringVal", 3, AttributeType.STRING, null, "TEST", "And this is another comment...");
+
 
 		employee.addAttribute("firstName", 1, AttributeType.STRING);
 		employee.addAttribute("lastName", 2, AttributeType.STRING);
@@ -59,6 +64,7 @@ public class MessageProtocol implements ModelCollectionProvider {
 
 		ServiceProtocol testService = modelCollection.createService("testService");
 		testService.addMethod("method1", company, employee);
+		testService.addBroadcastMethod("broadcastMethod1", employee);
 
 		return modelCollection;
 	}

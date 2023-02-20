@@ -18,10 +18,16 @@ public abstract class {type} extends AbstractClusterService {
 {methods}
 	@Override
 	public Message handleMessage(String method, Message request) {
-		switch (method) {
+		return switch (method) {
 {cases}
-		}
-		return null;
+			default -> null;
+		};
 	}
 
+	@Override
+	public void handleBroadcastMessage(String method, Message request) {
+		switch (method) {
+{broadcastCases}
+		}
+	}
 }

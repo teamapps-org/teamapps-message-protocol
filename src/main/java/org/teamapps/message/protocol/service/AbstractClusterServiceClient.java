@@ -37,6 +37,15 @@ public abstract class AbstractClusterServiceClient {
 		return clusterServiceRegistry.executeServiceMethod(serviceName, method, request, responseDecoder);
 	}
 
+	protected <REQUEST extends Message, RESPONSE extends Message> RESPONSE executeClusterServiceMethod(String clusterNodeId, String method, REQUEST request, PojoObjectDecoder<RESPONSE> responseDecoder) {
+		return clusterServiceRegistry.executeServiceMethod(clusterNodeId, serviceName, method, request, responseDecoder);
+	}
+
+
+	protected <MESSAGE extends Message> void executeServiceBroadcast(String method, MESSAGE message) {
+		clusterServiceRegistry.executeServiceBroadcast(serviceName, method, message);
+	}
+
 	public boolean isAvailable() {
 		return clusterServiceRegistry.isServiceAvailable(serviceName);
 	}

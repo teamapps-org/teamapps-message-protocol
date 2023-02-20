@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.teamapps.message.protocol.message.MessageDefinition;
 import org.teamapps.message.protocol.model.MessageModel;
 import org.teamapps.protocol.test.Company;
+import org.teamapps.protocol.test.XmlTest;
 
 import java.io.IOException;
 
@@ -37,5 +38,16 @@ public class MessageDefinitionTest {
 		MessageDefinition definition = new MessageDefinition(bytes);
 		System.out.println(messageModel.toString());
 		assertEquals(messageModel.toString(), definition.toString());
+	}
+
+	@Test
+	public void xmlTest() throws IOException {
+		String xml = new XmlTest().setIntVal(1).setIntVal2(2).setStringVal("abc").toXml(true, null);
+		assertTrue(xml.contains("This is a comment"));
+		System.out.println(xml);
+
+		xml = new XmlTest().toXml(true, null);
+		assertTrue(xml.contains("This is a comment"));
+		System.out.println(xml);
 	}
 }

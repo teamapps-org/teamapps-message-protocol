@@ -29,6 +29,7 @@ public class ServiceProtocol {
 
 	private final String serviceName;
 	private final List<ProtocolServiceMethod> serviceMethods = new ArrayList<>();
+	private final List<ProtocolServiceBroadcastMethod> broadcastMethods = new ArrayList<>();
 
 	public ServiceProtocol(String serviceName) {
 		this.serviceName = serviceName;
@@ -43,11 +44,20 @@ public class ServiceProtocol {
 		return addMethod(new ProtocolServiceMethod(methodName, inputMessage, outputMessage));
 	}
 
+	public ServiceProtocol addBroadcastMethod(String methodName, MessageDefinition message) {
+		broadcastMethods.add(new ProtocolServiceBroadcastMethod(methodName, message));
+		return this;
+	}
+
 	public String getServiceName() {
 		return serviceName;
 	}
 
 	public List<ProtocolServiceMethod> getServiceMethods() {
 		return serviceMethods;
+	}
+
+	public List<ProtocolServiceBroadcastMethod> getBroadcastMethods() {
+		return broadcastMethods;
 	}
 }

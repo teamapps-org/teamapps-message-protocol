@@ -6,6 +6,7 @@ import org.teamapps.message.protocol.service.*;
 import org.teamapps.message.protocol.file.*;
 import java.util.HashMap;
 import java.util.Map;
+import static org.teamapps.message.protocol.message.MessageDefinition.readBase64Message;
 
 public class {type} {
 

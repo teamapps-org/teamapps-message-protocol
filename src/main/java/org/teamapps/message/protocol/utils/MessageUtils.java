@@ -31,6 +31,28 @@ import java.time.*;
 import java.util.BitSet;
 
 public class MessageUtils {
+
+	public static Message readMessageOrNull(DataInputStream dis) throws IOException {
+		int len = dis.readInt();
+		if (len == 0) {
+			return null;
+		} else {
+			byte[] bytes = new byte[len];
+			dis.readFully(bytes);
+			return new Message(bytes);
+		}
+	}
+
+	public static void writeNullableMessage(DataOutputStream dos, Message message) throws IOException {
+		if (message == null) {
+			dos.writeInt(0);
+		} else {
+			byte[] bytes = message.toBytes();
+			dos.writeInt(bytes.length);
+			dos.write(bytes);
+		}
+	}
+
 	public static FileData readFile(DataInputStream dis, FileDataReader fileProvider) throws IOException {
 		long length = dis.readLong();
 		if (length == 0) {

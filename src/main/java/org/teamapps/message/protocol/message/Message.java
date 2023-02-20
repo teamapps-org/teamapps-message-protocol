@@ -20,6 +20,7 @@
 package org.teamapps.message.protocol.message;
 
 
+import org.teamapps.message.protocol.file.FileDataType;
 import org.teamapps.message.protocol.model.*;
 import org.teamapps.message.protocol.file.FileData;
 import org.teamapps.message.protocol.file.FileDataReader;
@@ -239,26 +240,65 @@ public class Message {
 	}
 
 	public String toXml() throws IOException  {
-		return toXml(null);
+		return toXml(false, null);
 	}
 
-	public String toXml(FileDataWriter fileDataWriter) throws IOException {
-		XmlNode xmlNode = toXml(null, fileDataWriter);
+	public String toXml(boolean withComments, FileDataWriter fileDataWriter) throws IOException {
+		XmlNode xmlNode = toXml(null, withComments, fileDataWriter);
 		XmlBuilder xmlBuilder = new XmlBuilder(xmlNode);
 		return xmlBuilder.getXml();
 	}
 
-	protected XmlNode toXml(XmlNode parentNode, FileDataWriter fileDataWriter) throws IOException {
-		XmlNode xmlNode = new XmlNode(getMessageDefName());
-		for (MessageAttribute attribute : getAttributes()) {
-			MessageAttributeImpl messageAttribute = (MessageAttributeImpl) attribute;
-			messageAttribute.toXml(xmlNode, fileDataWriter);
+	protected XmlNode toXml(XmlNode parentNode, boolean withComments, FileDataWriter fileDataWriter) throws IOException {
+		XmlNode xmlNode = withComments ? new XmlNode(getMessageDefName(), null, messageModel.getComment()) : new XmlNode(getMessageDefName());
+		if (!withComments) {
+			for (MessageAttribute attribute : getAttributes()) {
+				MessageAttributeImpl messageAttribute = (MessageAttributeImpl) attribute;
+				messageAttribute.toXml(xmlNode, false, fileDataWriter);
+			}
+		} else {
+			for (AttributeDefinition attributeDefinition : messageModel.getAttributeDefinitions()) {
+				MessageAttribute attribute = getAttribute(attributeDefinition.getName());
+				if (attribute != null) {
+					MessageAttributeImpl messageAttribute = (MessageAttributeImpl) attribute;
+					messageAttribute.toXml(xmlNode, true, fileDataWriter);
+				} else if (attributeDefinition.getComment() != null || attributeDefinition.getDefaultValue() != null) {
+					xmlNode.addChild(new XmlNode(attributeDefinition.getName(), attributeDefinition.getDefaultValue(), attributeDefinition.getComment()));
+				}
+			}
 		}
+
 		if (parentNode != null) {
 			parentNode.addChild(xmlNode);
 			return parentNode;
 		} else {
 			return xmlNode;
+		}
+	}
+
+	public void deleteAllEmbeddedFiles() {
+		for (MessageAttribute attribute : attributes) {
+			AttributeType type = attribute.getAttributeDefinition().getType();
+			String propertyName = attribute.getAttributeDefinition().getName();
+			if (type == AttributeType.FILE) {
+				FileData fileData = getFileData(propertyName);
+				if (fileData != null && fileData.getType() == FileDataType.LOCAL_FILE) {
+					File file = new File(fileData.getDescriptor());
+					if (file.exists()) {
+						file.delete();
+					}
+				}
+			} else if (type == AttributeType.OBJECT_SINGLE_REFERENCE) {
+				Message referencedObject = getReferencedObject(propertyName);
+				if (referencedObject != null) {
+					referencedObject.deleteAllEmbeddedFiles();
+				}
+			} else if (type == AttributeType.OBJECT_MULTI_REFERENCE) {
+				List<Message> referencedObjects = getReferencedObjects(propertyName);
+				if (referencedObjects != null) {
+					referencedObjects.forEach(Message::deleteAllEmbeddedFiles);
+				}
+			}
 		}
 	}
 

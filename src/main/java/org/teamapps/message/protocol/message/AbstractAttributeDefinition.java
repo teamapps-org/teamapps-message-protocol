@@ -36,18 +36,18 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 	private final String name;
 	private final int key;
 	private final AttributeType type;
-	private final String specificType;
-	private final String comment;
 	private final String defaultValue;
+	private final String comment;
+	private final Message specificType;
 	private final MessageModel referencedObject;
 	private final boolean multiReference;
 	private final EnumDefinition enumDefinition;
 
-	public AbstractAttributeDefinition(MessageModel parent, String name, int key, AttributeType type, String specificType){
+	public AbstractAttributeDefinition(MessageModel parent, String name, int key, AttributeType type, Message specificType){
 		this(parent, name, key, type, specificType, null, null);
 	}
 
-	public AbstractAttributeDefinition(MessageModel parent, String name, int key, AttributeType type, String specificType, String defaultValue, String comment) {
+	public AbstractAttributeDefinition(MessageModel parent, String name, int key, AttributeType type, Message specificType, String defaultValue, String comment) {
 		this.parent = parent;
 		this.name = name;
 		this.key = key;
@@ -60,11 +60,11 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.enumDefinition = null;
 	}
 
-	public AbstractAttributeDefinition(MessageModel parent, String name, int key, EnumDefinition enumDefinition, String specificType) {
+	public AbstractAttributeDefinition(MessageModel parent, String name, int key, EnumDefinition enumDefinition, Message specificType) {
 		this(parent, name, key, enumDefinition, specificType, null, null);
 	}
 
-	public AbstractAttributeDefinition(MessageModel parent, String name, int key, EnumDefinition enumDefinition, String specificType, String defaultValue, String comment) {
+	public AbstractAttributeDefinition(MessageModel parent, String name, int key, EnumDefinition enumDefinition, Message specificType, String defaultValue, String comment) {
 		this.parent = parent;
 		this.name = name;
 		this.key = key;
@@ -77,11 +77,11 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.enumDefinition = enumDefinition;
 	}
 
-	public AbstractAttributeDefinition(MessageModel parent, String name, int key, String specificType, MessageModel referencedObject, boolean multiReference) {
+	public AbstractAttributeDefinition(MessageModel parent, String name, int key, Message specificType, MessageModel referencedObject, boolean multiReference) {
 		this(parent, name, key, specificType, referencedObject, multiReference, null);
 	}
 
-	public AbstractAttributeDefinition(MessageModel parent, String name, int key, String specificType, MessageModel referencedObject, boolean multiReference, String comment) {
+	public AbstractAttributeDefinition(MessageModel parent, String name, int key, Message specificType, MessageModel referencedObject, boolean multiReference, String comment) {
 		this.parent = parent;
 		this.name = name;
 		this.key = key;
@@ -103,7 +103,7 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.name = MessageUtils.readString(dis);
 		this.key = dis.readInt();
 		this.type = AttributeType.getById(dis.readInt());
-		this.specificType = MessageUtils.readString(dis);
+		this.specificType = MessageUtils.readMessageOrNull(dis);
 		this.defaultValue = MessageUtils.readString(dis);
 		this.comment = MessageUtils.readString(dis);
 
@@ -147,7 +147,7 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		MessageUtils.writeString(dos, name);
 		dos.writeInt(key);
 		dos.writeInt(type.getId());
-		MessageUtils.writeString(dos, specificType);
+		MessageUtils.writeNullableMessage(dos, specificType);
 		MessageUtils.writeString(dos, defaultValue);
 		MessageUtils.writeString(dos, comment);
 		if (isReferenceProperty()) {
@@ -207,7 +207,7 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 	}
 
 	@Override
-	public String getSpecificType() {
+	public Message getSpecificType() {
 		return specificType;
 	}
 

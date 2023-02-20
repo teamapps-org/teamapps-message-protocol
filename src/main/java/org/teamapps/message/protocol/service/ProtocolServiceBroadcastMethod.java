@@ -17,16 +17,25 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package org.teamapps.message.protocol.model;
+package org.teamapps.message.protocol.service;
 
-import org.teamapps.message.protocol.message.Message;
+import org.teamapps.message.protocol.message.MessageDefinition;
 
-public interface BaseDefinition {
+public class ProtocolServiceBroadcastMethod {
 
-	String getName();
+	private final String methodName;
+	private final MessageDefinition message;
 
-	Message getSpecificType();
+	public ProtocolServiceBroadcastMethod(String methodName, MessageDefinition message) {
+		this.methodName = methodName;
+		this.message = message;
+	}
 
-	String getComment();
+	public MessageDefinition getMessage() {
+		return message;
+	}
 
+	public String getMethodName() {
+		return methodName;
+	}
 }

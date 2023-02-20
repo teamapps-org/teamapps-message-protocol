@@ -26,6 +26,8 @@ public class XmlNode {
 
 	private String name;
 	private String value;
+	private String defaultValue;
+	private String comment;
 	private List<XmlNode> children = new ArrayList<>();
 
 
@@ -36,6 +38,19 @@ public class XmlNode {
 	public XmlNode(String name, String value) {
 		this.name = name;
 		this.value = value;
+	}
+
+	public XmlNode(String name, String defaultValue, String comment) {
+		this.name = name;
+		this.defaultValue = defaultValue;
+		this.comment = comment;
+	}
+
+	public XmlNode(String name, String value, String defaultValue, String comment) {
+		this.name = name;
+		this.value = value;
+		this.defaultValue = defaultValue;
+		this.comment = comment;
 	}
 
 	public boolean isValue() {
@@ -56,6 +71,22 @@ public class XmlNode {
 
 	public String getValue() {
 		return value;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public List<XmlNode> getChildren() {

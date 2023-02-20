@@ -20,12 +20,14 @@
 package org.teamapps.message.protocol.builder;
 
 import org.apache.commons.io.IOUtils;
+import org.teamapps.message.protocol.message.Message;
 import org.teamapps.message.protocol.model.MessageModel;
 import org.teamapps.message.protocol.model.ModelCollection;
 import org.teamapps.message.protocol.message.AttributeType;
 import org.teamapps.message.protocol.message.MessageDefinition;
 import org.teamapps.message.protocol.model.AttributeDefinition;
 import org.teamapps.message.protocol.model.EnumDefinition;
+import org.teamapps.message.protocol.service.ProtocolServiceBroadcastMethod;
 import org.teamapps.message.protocol.service.ProtocolServiceMethod;
 import org.teamapps.message.protocol.service.ServiceProtocol;
 
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 
 public class MessagePojoBuilder {
 
@@ -68,17 +71,26 @@ public class MessagePojoBuilder {
 
 			StringBuilder data = new StringBuilder();
 			StringBuilder cases = new StringBuilder();
+			StringBuilder broadcastCases = new StringBuilder();
 			for (ProtocolServiceMethod method : serviceProtocol.getServiceMethods()) {
 				String inputMessageName = method.getInputMessage().getName();
 				data.append(getTabs(1)).append("public abstract ")
 						.append(firstUpperCase(method.getOutputMessage().getName()))
 						.append(" ").append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(" value);\n\n");
-				cases.append(getTabs(3)).append("case \"").append(method.getMethodName()).append("\" -> {\n");
-				cases.append(getTabs(4)).append("return ").append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(".remap(request));\n");
-				cases.append(getTabs(3)).append("}\n");
+				cases.append(getTabs(3)).append("case \"").append(method.getMethodName()).append("\" -> ").append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(".remap(request));\n");
 			}
+
+			for (ProtocolServiceBroadcastMethod method : serviceProtocol.getBroadcastMethods()) {
+				String inputMessageName = method.getMessage().getName();
+				data.append(getTabs(1)).append("public abstract void ")
+						.append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(" value);\n\n");
+				broadcastCases.append(getTabs(3)).append("case \"").append(method.getMethodName()).append("\" -> ").append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(".remap(request));\n");
+			}
+
+
 			tpl = setValue(tpl, "methods", data.toString());
 			tpl = setValue(tpl, "cases", cases.toString());
+			tpl = setValue(tpl, "broadcastCases", broadcastCases.toString());
 
 			File file = new File(directory, type + ".java");
 			Files.writeString(file.toPath(), tpl);
@@ -93,11 +105,27 @@ public class MessagePojoBuilder {
 			for (ProtocolServiceMethod method : serviceProtocol.getServiceMethods()) {
 				String inputMessageName = method.getInputMessage().getName();
 				String outputMessageName = method.getOutputMessage().getName();
+
 				data.append(getTabs(1)).append("public ").append(firstUpperCase(outputMessageName))
 						.append(" ").append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(" value) {\n");
 				data.append(getTabs(2)).append("return executeClusterServiceMethod(\"").append(method.getMethodName()).append("\", value, ").append(firstUpperCase(outputMessageName)).append(".getMessageDecoder());\n");
 				data.append(getTabs(1)).append("}\n\n");
+
+				data.append(getTabs(1)).append("public ").append(firstUpperCase(outputMessageName))
+						.append(" ").append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(" value, String clusterNodeId) {\n");
+				data.append(getTabs(2)).append("return executeClusterServiceMethod(clusterNodeId, \"").append(method.getMethodName()).append("\", value, ").append(firstUpperCase(outputMessageName)).append(".getMessageDecoder());\n");
+				data.append(getTabs(1)).append("}\n\n");
 			}
+
+			for (ProtocolServiceBroadcastMethod method : serviceProtocol.getBroadcastMethods()) {
+				String inputMessageName = method.getMessage().getName();
+				data.append(getTabs(1)).append("public void ")
+						.append(method.getMethodName()).append("(").append(firstUpperCase(inputMessageName)).append(" value) {\n");
+				data.append(getTabs(2)).append("executeServiceBroadcast(\"").append(method.getMethodName()).append("\", value);\n");
+				data.append(getTabs(1)).append("}\n\n");
+			}
+
+
 			tpl = setValue(tpl, "methods", data.toString());
 
 			file = new File(directory, type + ".java");
@@ -125,7 +153,7 @@ public class MessagePojoBuilder {
 					.append(withQuotes(objName)).append(", ")
 					.append(withQuotes(model.getObjectUuid())).append(", ")
 					.append(model.getModelVersion()).append(", ")
-					.append(withQuotes(model.getSpecificType())).append(", ")
+					.append(base64EncodedReader(model.getSpecificType())).append(", ")
 					.append("" + model.isMessageRecord())
 					.append(");\n");
 		}
@@ -163,7 +191,7 @@ public class MessagePojoBuilder {
 							.append(".").append(method).append("(")
 							.append(withQuotes(propDef.getName())).append(", ")
 							.append(propDef.getKey()).append(", ")
-							.append(withQuotes(propDef.getSpecificType())).append(", ")
+							.append(base64EncodedReader(propDef.getSpecificType())).append(", ")
 							.append(propDef.getReferencedObject().getName())
 							.append(");\n");
 
@@ -174,7 +202,7 @@ public class MessagePojoBuilder {
 							.append(withQuotes(propDef.getName())).append(", ")
 							.append(propDef.getEnumDefinition().getName()).append(", ")
 							.append(propDef.getKey()).append(", ")
-							.append(withQuotes(propDef.getSpecificType()))
+							.append(base64EncodedReader(propDef.getSpecificType()))
 							.append(");\n");
 				} else {
 					data.append(getTabs(2))
@@ -183,7 +211,9 @@ public class MessagePojoBuilder {
 							.append(withQuotes(propDef.getName())).append(", ")
 							.append(propDef.getKey()).append(", ")
 							.append("AttributeType.").append(propDef.getType()).append(", ")
-							.append(withQuotes(propDef.getSpecificType()))
+							.append(base64EncodedReader(propDef.getSpecificType())).append(", ")
+							.append(propDef.getDefaultValue() != null ? withQuotes(propDef.getDefaultValue()) : null).append(", ")
+							.append(propDef.getComment() != null ? withQuotes(propDef.getComment()) : null)
 							.append(");\n");
 				}
 
@@ -394,6 +424,14 @@ public class MessagePojoBuilder {
 
 	private static String withQuotes(String value) {
 		return value != null ? "\"" + value + "\"" : "null";
+	}
+
+	private static String base64EncodedReader(Message message) {
+		try {
+			return message == null ? "null" : "readBase64Message(\"" + Base64.getEncoder().encodeToString(message.toBytes()) + "\")";
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static String getReturnType(AttributeDefinition propDef) {

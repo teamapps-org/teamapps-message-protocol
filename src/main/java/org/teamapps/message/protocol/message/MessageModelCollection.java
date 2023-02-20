@@ -55,13 +55,13 @@ public class MessageModelCollection implements ModelCollection {
 		return definition;
 	}
 
-	public MessageDefinition createModel(String name, String uuid, String specificType, boolean messageRecord) {
+	public MessageDefinition createModel(String name, String uuid, Message specificType, boolean messageRecord) {
 		MessageDefinition definition = new MessageDefinition(uuid, name, specificType, messageRecord, version);
 		addModel(definition);
 		return definition;
 	}
 
-	public MessageDefinition createModel(String name, String uuid, int modelVersion, String specificType, boolean messageRecord) {
+	public MessageDefinition createModel(String name, String uuid, int modelVersion, Message specificType, boolean messageRecord) {
 		MessageDefinition definition = new MessageDefinition(uuid, name, specificType, messageRecord, modelVersion);
 		addModel(definition);
 		return definition;

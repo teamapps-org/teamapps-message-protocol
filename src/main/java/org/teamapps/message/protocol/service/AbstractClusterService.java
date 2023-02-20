@@ -47,4 +47,6 @@ public abstract class AbstractClusterService {
 
 	public abstract Message handleMessage(String method, Message request);
 
+	public abstract void handleBroadcastMessage(String method, Message request);
+
 }

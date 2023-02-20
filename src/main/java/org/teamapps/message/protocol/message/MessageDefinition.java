@@ -40,8 +40,8 @@ public class MessageDefinition implements MessageModel {
 	public final static Set<String> RESERVED_NAMES_LOWER_CASE = Stream.of(META_RECORD_ID, META_CREATION_DATE, META_CREATED_BY, META_MODIFICATION_DATE, META_MODIFIED_BY).map(String::toLowerCase).collect(Collectors.toSet());
 
 	private final String name;
-	private final String specificType;
 	private final String comment;
+	private final Message specificType;
 	private final String objectUuid;
 	private final short modelVersion;
 	private final boolean messageRecord;
@@ -49,15 +49,23 @@ public class MessageDefinition implements MessageModel {
 	private final Map<Integer, AttributeDefinition> definitionByKey = new HashMap<>();
 	private final Map<String, AttributeDefinition> definitionByName = new HashMap<>();
 
+	public static Message readBase64Message(String msg) {
+		try {
+			return msg == null ? null : new Message(Base64.getDecoder().decode(msg));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public MessageDefinition(String objectUuid, String name, boolean messageRecord, int modelVersion) {
 		this(objectUuid, name, null, messageRecord, modelVersion);
 	}
 
-	public MessageDefinition(String objectUuid, String name, String specificType, boolean messageRecord, int modelVersion) {
+	public MessageDefinition(String objectUuid, String name, Message specificType, boolean messageRecord, int modelVersion) {
 		this(objectUuid, name, specificType, messageRecord, modelVersion, null);
 	}
 
-	public MessageDefinition(String objectUuid, String name, String specificType, boolean messageRecord, int modelVersion, String comment) {
+	public MessageDefinition(String objectUuid, String name, Message specificType, boolean messageRecord, int modelVersion, String comment) {
 		this.objectUuid = objectUuid;
 		this.name = name;
 		this.specificType = specificType;
@@ -82,7 +90,7 @@ public class MessageDefinition implements MessageModel {
 	}
 
 	public MessageDefinition(DataInputStream dis, DefinitionCache definitionCache) throws IOException {
-		this(MessageUtils.readString(dis), MessageUtils.readString(dis), MessageUtils.readString(dis), dis.readBoolean(), dis.readShort(), MessageUtils.readString(dis));
+		this(MessageUtils.readString(dis), MessageUtils.readString(dis), MessageUtils.readMessageOrNull(dis), dis.readBoolean(), dis.readShort(), MessageUtils.readString(dis));
 		definitionCache.addModel(this);
 		int size = dis.readInt();
 		for (int i = 0; i < size; i++) {
@@ -100,7 +108,7 @@ public class MessageDefinition implements MessageModel {
 	public void write(DataOutputStream dos, DefinitionCache definitionCache) throws IOException {
 		MessageUtils.writeString(dos, objectUuid);
 		MessageUtils.writeString(dos, getName());
-		MessageUtils.writeString(dos, getSpecificType());
+		MessageUtils.writeNullableMessage(dos, getSpecificType());
 		dos.writeBoolean(messageRecord);
 		dos.writeShort(modelVersion);
 		MessageUtils.writeString(dos, comment);
@@ -125,7 +133,7 @@ public class MessageDefinition implements MessageModel {
 	}
 
 	@Override
-	public String getSpecificType() {
+	public Message getSpecificType() {
 		return specificType;
 	}
 
@@ -218,7 +226,7 @@ public class MessageDefinition implements MessageModel {
 		addEnum(name, enumDefinition, key, null);
 	}
 
-	public void addEnum(String name, EnumDefinition enumDefinition, int key, String specificType) {
+	public void addEnum(String name, EnumDefinition enumDefinition, int key, Message specificType) {
 		AbstractAttributeDefinition attributeDefinition = new AbstractAttributeDefinition(this, name, key, enumDefinition, specificType);
 		addAttribute(attributeDefinition);
 	}
@@ -227,8 +235,13 @@ public class MessageDefinition implements MessageModel {
 		addAttribute(name, key, type, null);
 	}
 
-	public void addAttribute(String name, int key, AttributeType type, String specificType) {
+	public void addAttribute(String name, int key, AttributeType type, Message specificType) {
 		AbstractAttributeDefinition attributeDefinition = new AbstractAttributeDefinition(this, name, key, type, specificType);
+		addAttribute(attributeDefinition);
+	}
+
+	public void addAttribute(String name, int key, AttributeType type, Message specificType, String defaultValue, String comment) {
+		AbstractAttributeDefinition attributeDefinition = new AbstractAttributeDefinition(this, name, key, type, specificType, defaultValue, comment);
 		addAttribute(attributeDefinition);
 	}
 
@@ -240,7 +253,7 @@ public class MessageDefinition implements MessageModel {
 		addSingleReference(name, key, null, referencedObject);
 	}
 
-	public void addSingleReference(String name, int key, String specificType, MessageDefinition referencedObject) {
+	public void addSingleReference(String name, int key, Message specificType, MessageDefinition referencedObject) {
 		AbstractAttributeDefinition referenceAttributeDefinition = new AbstractAttributeDefinition(this, name, key, specificType, referencedObject, false);
 		addAttribute(referenceAttributeDefinition);
 	}
@@ -253,7 +266,7 @@ public class MessageDefinition implements MessageModel {
 		addMultiReference(name, key, null, referencedObject);
 	}
 
-	public void addMultiReference(String name, int key, String specificType, MessageDefinition referencedObject) {
+	public void addMultiReference(String name, int key, Message specificType, MessageDefinition referencedObject) {
 		AbstractAttributeDefinition referenceAttributeDefinition = new AbstractAttributeDefinition(this, name, key, specificType, referencedObject, true);
 		addAttribute(referenceAttributeDefinition);
 	}

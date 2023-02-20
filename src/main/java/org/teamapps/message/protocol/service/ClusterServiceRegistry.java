@@ -33,4 +33,8 @@ public interface ClusterServiceRegistry {
 	boolean isServiceAvailable(String serviceName);
 
 	<REQUEST extends Message, RESPONSE extends Message> RESPONSE executeServiceMethod(String serviceName, String method, REQUEST request, PojoObjectDecoder<RESPONSE> responseDecoder);
+
+	<REQUEST extends Message, RESPONSE extends Message> RESPONSE executeServiceMethod(String clusterNodeId, String serviceName, String method, REQUEST request, PojoObjectDecoder<RESPONSE> responseDecoder);
+
+	<MESSAGE extends Message> void executeServiceBroadcast(String serviceName, String method, MESSAGE message);
 }

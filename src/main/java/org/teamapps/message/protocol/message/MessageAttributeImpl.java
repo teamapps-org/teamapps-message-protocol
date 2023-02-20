@@ -289,19 +289,19 @@ public class MessageAttributeImpl implements MessageAttribute {
 		return bos.toByteArray();
 	}
 
-	protected void toXml(XmlNode parentNode, FileDataWriter fileDataWriter) throws IOException {
-		XmlNode xmlNode = new XmlNode(attributeDefinition.getName());
+	protected void toXml(XmlNode parentNode, boolean withComments, FileDataWriter fileDataWriter) throws IOException {
+		XmlNode xmlNode = withComments ? new XmlNode(attributeDefinition.getName(), attributeDefinition.getDefaultValue(), attributeDefinition.getComment()) : new XmlNode(attributeDefinition.getName());
 		parentNode.addChild(xmlNode);
 		switch (attributeDefinition.getType()) {
 			case OBJECT_SINGLE_REFERENCE -> {
 				Message referencedObject = getReferencedObject();
-				referencedObject.toXml(xmlNode, fileDataWriter);
+				referencedObject.toXml(xmlNode, withComments, fileDataWriter);
 			}
 			case OBJECT_MULTI_REFERENCE -> {
 				List<Message> referencedObjects = getReferencedObjects();
 				if (referencedObjects != null) {
 					for (Message referencedObject : referencedObjects) {
-						referencedObject.toXml(xmlNode, fileDataWriter);
+						referencedObject.toXml(xmlNode, withComments, fileDataWriter);
 					}
 				}
 			}
