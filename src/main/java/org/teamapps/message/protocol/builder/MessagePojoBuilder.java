@@ -327,6 +327,15 @@ public class MessagePojoBuilder {
 
 			if (propDef.getType() == AttributeType.FILE) {
 				data.append(getTabs(1))
+						.append("public File get")
+						.append(firstUpperCase(propDef.getName())).append("AsFile").append("() {\n")
+						.append(getTabs(2))
+						.append("return get").append("File").append("(")
+						.append(withQuotes(propDef.getName())).append(");\n")
+						.append(getTabs(1))
+						.append("}\n\n");
+
+				data.append(getTabs(1))
 						.append("public String get")
 						.append(firstUpperCase(propDef.getName())).append("AsFileName").append("() {\n")
 						.append(getTabs(2))
@@ -350,10 +359,24 @@ public class MessagePojoBuilder {
 						.append(firstUpperCase(model.getName())).append(" ")
 						.append("set")
 						.append(firstUpperCase(propDef.getName())).append("(")
-						.append("File").append(" value) {\n")
+						.append("File file) {\n")
 						.append(getTabs(2))
 						.append("set").append(getGetterSetterMethodName(propDef)).append("(")
-						.append(withQuotes(propDef.getName())).append(", value);\n")
+						.append(withQuotes(propDef.getName())).append(", file);\n")
+						.append(getTabs(2))
+						.append("return this;\n")
+						.append(getTabs(1))
+						.append("}\n\n");
+
+				data.append(getTabs(1))
+						.append("public ")
+						.append(firstUpperCase(model.getName())).append(" ")
+						.append("set")
+						.append(firstUpperCase(propDef.getName())).append("(")
+						.append("File file, String fileName) {\n")
+						.append(getTabs(2))
+						.append("set").append(getGetterSetterMethodName(propDef)).append("(")
+						.append(withQuotes(propDef.getName())).append(", file, fileName);\n")
 						.append(getTabs(2))
 						.append("return this;\n")
 						.append(getTabs(1))
