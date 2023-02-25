@@ -67,6 +67,11 @@ public class LocalFileData implements FileData {
 	}
 
 	@Override
+	public File getAsFile() {
+		return new ProtectedFile(path);
+	}
+
+	@Override
 	public String getDescriptor() {
 		return path;
 	}
@@ -110,5 +115,10 @@ public class LocalFileData implements FileData {
 		inChannel.transferTo(0, fileToCopy.length(), outChannel);
 		inputStream.close();
 		outputStream.close();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
 	}
 }

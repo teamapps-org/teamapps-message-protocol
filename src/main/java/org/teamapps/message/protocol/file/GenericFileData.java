@@ -65,6 +65,11 @@ public class GenericFileData implements FileData {
 	}
 
 	@Override
+	public File getAsFile() {
+		return new ProtectedFile(path);
+	}
+
+	@Override
 	public String getDescriptor() {
 		return path;
 	}
