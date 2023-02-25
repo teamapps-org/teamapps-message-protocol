@@ -37,6 +37,7 @@ public class MessageDefinition implements MessageModel {
 	public final static String META_MODIFICATION_DATE = "modificationDate";
 	public final static String META_MODIFIED_BY = "modifiedBy";
 
+	public final static Set<String> META_FIELD_NAMES = Stream.of(META_RECORD_ID, META_CREATION_DATE, META_CREATED_BY, META_MODIFICATION_DATE, META_MODIFIED_BY).collect(Collectors.toSet());
 	public final static Set<String> RESERVED_NAMES_LOWER_CASE = Stream.of(META_RECORD_ID, META_CREATION_DATE, META_CREATED_BY, META_MODIFICATION_DATE, META_MODIFIED_BY).map(String::toLowerCase).collect(Collectors.toSet());
 
 	private final String name;

@@ -45,6 +45,8 @@ public interface AttributeDefinition extends BaseDefinition {
 
 	boolean isEnumProperty();
 
+	boolean isMetaDataField();
+
 	EnumDefinition getEnumDefinition();
 
 	void write(DataOutputStream dos) throws IOException;

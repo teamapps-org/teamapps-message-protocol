@@ -43,7 +43,7 @@ import java.util.List;
 public class MessageAttributeImpl implements MessageAttribute {
 
 	private final AttributeDefinition attributeDefinition;
-	private final Object value;
+	private Object value;
 
 	public MessageAttributeImpl(AttributeDefinition attributeDefinition, Object value) {
 		this.attributeDefinition = attributeDefinition;
@@ -232,13 +232,13 @@ public class MessageAttributeImpl implements MessageAttribute {
 
 
 	@Override
-	public void write(DataOutputStream dos, FileDataWriter fileDataWriter) throws IOException {
+	public void write(DataOutputStream dos, FileDataWriter fileDataWriter, boolean updateFileData) throws IOException {
 		dos.writeByte(attributeDefinition.getType().getId());
 		dos.writeShort(attributeDefinition.getKey());
 		switch (attributeDefinition.getType()) {
 			case OBJECT_SINGLE_REFERENCE -> {
 				Message referencedObject = getReferencedObject();
-				referencedObject.write(dos, fileDataWriter);
+				referencedObject.write(dos, fileDataWriter, updateFileData);
 			}
 			case OBJECT_MULTI_REFERENCE -> {
 				List<Message> referencedObjects = getReferencedObjects();
@@ -247,7 +247,7 @@ public class MessageAttributeImpl implements MessageAttribute {
 				} else {
 					dos.writeInt(referencedObjects.size());
 					for (Message referencedObject : referencedObjects) {
-						referencedObject.write(dos, fileDataWriter);
+						referencedObject.write(dos, fileDataWriter, updateFileData);
 					}
 				}
 			}
@@ -265,7 +265,13 @@ public class MessageAttributeImpl implements MessageAttribute {
 			case FLOAT_ARRAY -> MessageUtils.writeFloatArray(dos, getFloatArrayAttribute());
 			case DOUBLE_ARRAY -> MessageUtils.writeDoubleArray(dos, getDoubleArrayAttribute());
 			case STRING_ARRAY -> MessageUtils.writeStringArray(dos, getStringArrayAttribute());
-			case FILE -> MessageUtils.writeFile(dos, getFileData(), fileDataWriter);
+			case FILE -> {
+				//todo value should be final - create a message object with updated fields instead!
+				FileData fileData = MessageUtils.writeFile(dos, getFileData(), fileDataWriter);
+				if (updateFileData) {
+					value = fileData;
+				}
+			}
 			case TIMESTAMP_32 -> MessageUtils.writeInstant32(dos, getTimestampAttribute());
 			case TIMESTAMP_64 -> MessageUtils.writeInstant64(dos, getTimestampAttribute());
 			case DATE_TIME -> MessageUtils.writeLocalDateTime(dos, getDateTimeAttribute());
@@ -277,14 +283,20 @@ public class MessageAttributeImpl implements MessageAttribute {
 
 	@Override
 	public byte[] toBytes() throws IOException {
-		return toBytes(null);
+		return toBytes(null, false);
 	}
+
 
 	@Override
 	public byte[] toBytes(FileDataWriter fileDataWriter) throws IOException {
+		return toBytes(fileDataWriter, false);
+	}
+
+	@Override
+	public byte[] toBytes(FileDataWriter fileDataWriter, boolean updateFileData) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
-		write(dos, fileDataWriter);
+		write(dos, fileDataWriter, updateFileData);
 		dos.close();
 		return bos.toByteArray();
 	}

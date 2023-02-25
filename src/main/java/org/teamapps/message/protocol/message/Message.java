@@ -20,11 +20,8 @@
 package org.teamapps.message.protocol.message;
 
 
-import org.teamapps.message.protocol.file.FileDataType;
+import org.teamapps.message.protocol.file.*;
 import org.teamapps.message.protocol.model.*;
-import org.teamapps.message.protocol.file.FileData;
-import org.teamapps.message.protocol.file.FileDataReader;
-import org.teamapps.message.protocol.file.FileDataWriter;
 import org.teamapps.message.protocol.utils.MessageUtils;
 import org.teamapps.message.protocol.xml.XmlBuilder;
 import org.teamapps.message.protocol.xml.XmlNode;
@@ -219,11 +216,15 @@ public class Message {
 	}
 
 	public void write(DataOutputStream dos, FileDataWriter fileDataWriter) throws IOException {
+		write(dos, fileDataWriter, false);
+	}
+
+	public void write(DataOutputStream dos, FileDataWriter fileDataWriter, boolean updateFileData) throws IOException {
 		MessageUtils.writeString(dos, messageModel.getObjectUuid());
 		dos.writeShort(messageModel.getModelVersion());
 		dos.writeShort(attributes.size());
 		for (MessageAttribute field : attributes) {
-			field.write(dos, fileDataWriter);
+			field.write(dos, fileDataWriter, updateFileData);
 		}
 	}
 
@@ -232,9 +233,13 @@ public class Message {
 	}
 
 	public byte[] toBytes(FileDataWriter fileDataWriter) throws IOException {
+		return toBytes(fileDataWriter, false);
+	}
+
+	public byte[] toBytes(FileDataWriter fileDataWriter, boolean updateFileData) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
-		write(dos, fileDataWriter);
+		write(dos, fileDataWriter, updateFileData);
 		dos.close();
 		return bos.toByteArray();
 	}
@@ -561,6 +566,15 @@ public class Message {
 		MessageAttribute property = getAttribute(propertyName);
 		if (property != null) {
 			return property.getFileData();
+		} else {
+			return null;
+		}
+	}
+
+	public File getFile(String propertyName) {
+		MessageAttribute property = getAttribute(propertyName);
+		if (property != null) {
+			return property.getFileData().getAsFile();
 		} else {
 			return null;
 		}

@@ -232,6 +232,11 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 	}
 
 	@Override
+	public boolean isMetaDataField() {
+		return MessageDefinition.META_FIELD_NAMES.contains(name);
+	}
+
+	@Override
 	public EnumDefinition getEnumDefinition() {
 		return enumDefinition;
 	}

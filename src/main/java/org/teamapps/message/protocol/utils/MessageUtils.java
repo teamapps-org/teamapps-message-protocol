@@ -89,9 +89,10 @@ public class MessageUtils {
 		}
 	}
 
-	public static void writeFile(DataOutputStream dos, FileData fileData, FileDataWriter fileWriter) throws IOException {
+	public static FileData writeFile(DataOutputStream dos, FileData fileData, FileDataWriter fileWriter) throws IOException {
 		if (fileData == null) {
 			dos.writeLong(0);
+			return null;
 		} else {
 			FileData data = fileWriter != null ? fileWriter.writeFileData(fileData) : fileData;
 			dos.writeLong(data.getLength());
@@ -102,6 +103,7 @@ public class MessageUtils {
 			if (data.isEncrypted()) {
 				writeString(dos, data.getEncryptionKey());
 			}
+			return data;
 		}
 	}
 
