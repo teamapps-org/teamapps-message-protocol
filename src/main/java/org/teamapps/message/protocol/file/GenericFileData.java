@@ -22,6 +22,8 @@ package org.teamapps.message.protocol.file;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class GenericFileData implements FileData {
 	private final FileDataType type;
@@ -89,29 +91,4 @@ public class GenericFileData implements FileData {
 		return new File(path).getParentFile().getPath();
 	}
 
-	@Override
-	public File copyToTempFile() throws IOException {
-		File fileToCopy = new File(path);
-		FileInputStream inputStream = new FileInputStream(fileToCopy);
-		FileChannel inChannel = inputStream.getChannel();
-		File tempFile = Files.createTempFile("tmp", "." + getFileExtension()).toFile();
-		FileOutputStream outputStream = new FileOutputStream(tempFile);
-		FileChannel outChannel = outputStream.getChannel();
-		inChannel.transferTo(0, fileToCopy.length(), outChannel);
-		inputStream.close();
-		outputStream.close();
-		return tempFile;
-	}
-
-	@Override
-	public void copyToFile(File file) throws IOException {
-		File fileToCopy = new File(path);
-		FileInputStream inputStream = new FileInputStream(fileToCopy);
-		FileChannel inChannel = inputStream.getChannel();
-		FileOutputStream outputStream = new FileOutputStream(file);
-		FileChannel outChannel = outputStream.getChannel();
-		inChannel.transferTo(0, fileToCopy.length(), outChannel);
-		inputStream.close();
-		outputStream.close();
-	}
 }
