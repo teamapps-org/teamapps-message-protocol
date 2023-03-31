@@ -19,6 +19,8 @@
  */
 package org.teamapps.message.protocol.model;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public interface EnumDefinition {
@@ -26,4 +28,8 @@ public interface EnumDefinition {
 	String getName();
 
 	List<String> getEnumValues();
+
+	byte[] toBytes() throws IOException;
+
+	void write(DataOutputStream dos) throws IOException;
 }

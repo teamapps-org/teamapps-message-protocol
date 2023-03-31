@@ -22,7 +22,7 @@ package org.teamapps.message.protocol.model;
 import java.io.IOException;
 import java.util.List;
 
-public interface ModelRegistry {
+public interface ModelRegistry extends PojoObjectDecoderRegistry {
 
 	void mergeRegistry(ModelRegistry registry);
 

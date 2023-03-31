@@ -20,7 +20,10 @@
 package org.teamapps.message.protocol.message;
 
 import org.teamapps.message.protocol.model.EnumDefinition;
+import org.teamapps.message.protocol.utils.MessageUtils;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnumDefinitionImpl implements EnumDefinition {
@@ -33,6 +36,19 @@ public class EnumDefinitionImpl implements EnumDefinition {
 		this.values = values;
 	}
 
+	public EnumDefinitionImpl(byte[] bytes) throws IOException {
+		this(new DataInputStream(new ByteArrayInputStream(bytes)));
+	}
+
+	public EnumDefinitionImpl(DataInputStream dis) throws IOException {
+		this.name = MessageUtils.readString(dis);
+		this.values = new ArrayList<>();
+		int valueCount = dis.readInt();
+		for (int i = 0; i < valueCount; i++) {
+			values.add(MessageUtils.readString(dis));
+		}
+	}
+
 	@Override
 	public String getName() {
 		return name;
@@ -41,5 +57,23 @@ public class EnumDefinitionImpl implements EnumDefinition {
 	@Override
 	public List<String> getEnumValues() {
 		return values;
+	}
+
+	@Override
+	public byte[] toBytes() throws IOException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		write(dos);
+		dos.close();
+		return bos.toByteArray();
+	}
+
+	@Override
+	public void write(DataOutputStream dos) throws IOException {
+		MessageUtils.writeString(dos, name);
+		dos.writeInt(values.size());
+		for (String value : values) {
+			MessageUtils.writeString(dos, value);
+		}
 	}
 }

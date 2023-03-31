@@ -20,13 +20,13 @@
 package org.teamapps.message.protocol.model;
 
 import org.teamapps.message.protocol.file.FileDataReader;
-import org.teamapps.message.protocol.message.Message;
+import org.teamapps.message.protocol.message.MessageRecord;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
-public interface PojoObjectDecoder<MESSAGE extends Message> {
+public interface PojoObjectDecoder<MESSAGE extends MessageRecord> {
 
 	MESSAGE decode(DataInputStream dis, FileDataReader fileDataReader);
 
@@ -34,7 +34,7 @@ public interface PojoObjectDecoder<MESSAGE extends Message> {
 
 	MESSAGE decode(String xml, FileDataReader fileDataReader);
 
-	MESSAGE remap(Message message);
+	MESSAGE remap(MessageRecord message);
 
 	MESSAGE defaultMessage();
 

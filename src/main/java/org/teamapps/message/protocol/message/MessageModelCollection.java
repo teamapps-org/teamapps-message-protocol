@@ -21,7 +21,9 @@ package org.teamapps.message.protocol.message;
 
 import org.teamapps.message.protocol.model.*;
 import org.teamapps.message.protocol.service.ServiceProtocol;
+import org.teamapps.message.protocol.utils.MessageUtils;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +38,32 @@ public class MessageModelCollection implements ModelCollection {
 	private final List<MessageModel> models = new ArrayList<>();
 	private final List<EnumDefinition> enums = new ArrayList<>();
 	private final Map<String, MessageModel> modelByKey = new ConcurrentHashMap<>();
-	private Map<String, PojoObjectDecoder<? extends Message>> decoderByUuid = new ConcurrentHashMap<>();
 	private List<ServiceProtocol> serviceProtocols = new ArrayList<>();
+	private Map<String, PojoObjectDecoder<? extends Message>> decoderByUuid = new ConcurrentHashMap<>();
+
+	public MessageModelCollection(byte[] bytes) throws IOException {
+		this(new DataInputStream(new ByteArrayInputStream(bytes)));
+	}
+
+	public MessageModelCollection(DataInputStream dis) throws IOException {
+		this.name = MessageUtils.readString(dis);
+		this.namespace = MessageUtils.readString(dis);
+		this.version = dis.readInt();
+		int modelCount = dis.readInt();
+		for (int i = 0; i < modelCount; i++) {
+			MessageDefinition model = new MessageDefinition(dis);
+			addModel(model);
+		}
+		int enumCount = dis.readInt();
+		for (int i = 0; i < enumCount; i++) {
+			EnumDefinitionImpl enumDefinition = new EnumDefinitionImpl(dis);
+			enums.add(enumDefinition);
+		}
+		int serviceProtocolCount = dis.readInt();
+		for (int i = 0; i < serviceProtocolCount; i++) {
+			serviceProtocols.add(new ServiceProtocol(dis));
+		}
+	}
 
 	public MessageModelCollection(String name, String namespace, int version) {
 		this.name = name;
@@ -144,7 +170,30 @@ public class MessageModelCollection implements ModelCollection {
 	}
 
 	@Override
-	public byte[] toBytes() {
-		return new byte[0];
+	public void write(DataOutputStream dos) throws IOException {
+		MessageUtils.writeString(dos, name);
+		MessageUtils.writeString(dos, namespace);
+		dos.writeInt(version);
+		dos.writeInt(models.size());
+		for (MessageModel model : models) {
+			model.write(dos);
+		}
+		dos.writeInt(enums.size());
+		for (EnumDefinition enumDefinition : enums) {
+			enumDefinition.write(dos);
+		}
+		dos.writeInt(serviceProtocols.size());
+		for (ServiceProtocol serviceProtocol : serviceProtocols) {
+			serviceProtocol.write(dos);
+		}
+	}
+
+	@Override
+	public byte[] toBytes() throws IOException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		write(dos);
+		dos.close();
+		return bos.toByteArray();
 	}
 }

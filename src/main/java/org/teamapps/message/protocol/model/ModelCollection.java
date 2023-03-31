@@ -19,8 +19,11 @@
  */
 package org.teamapps.message.protocol.model;
 
+import org.teamapps.message.protocol.message.DefinitionCache;
 import org.teamapps.message.protocol.service.ServiceProtocol;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public interface ModelCollection extends PojoObjectDecoderRegistry {
@@ -40,5 +43,7 @@ public interface ModelCollection extends PojoObjectDecoderRegistry {
 
 	List<ServiceProtocol> getProtocolServiceSchemas();
 
-	byte[] toBytes();
+	void write(DataOutputStream dos) throws IOException;
+
+	byte[] toBytes() throws IOException;
 }

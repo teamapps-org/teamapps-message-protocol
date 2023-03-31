@@ -44,5 +44,7 @@ public interface MessageModel extends BaseDefinition {
 
 	String explain(int level, Set<String> printedObjects);
 
+	void write(DataOutputStream dos) throws IOException;
+
 	void write(DataOutputStream dos, DefinitionCache definitionCache) throws IOException;
 }

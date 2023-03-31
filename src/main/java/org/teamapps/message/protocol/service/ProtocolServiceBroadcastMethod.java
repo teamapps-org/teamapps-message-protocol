@@ -20,6 +20,9 @@
 package org.teamapps.message.protocol.service;
 
 import org.teamapps.message.protocol.message.MessageDefinition;
+import org.teamapps.message.protocol.utils.MessageUtils;
+
+import java.io.*;
 
 public class ProtocolServiceBroadcastMethod {
 
@@ -31,11 +34,33 @@ public class ProtocolServiceBroadcastMethod {
 		this.message = message;
 	}
 
+	public ProtocolServiceBroadcastMethod(byte[] bytes) throws IOException {
+		this(new DataInputStream(new ByteArrayInputStream(bytes)));
+	}
+
+	public ProtocolServiceBroadcastMethod(DataInputStream dis) throws IOException {
+		this.methodName = MessageUtils.readString(dis);
+		this.message = new MessageDefinition(dis);
+	}
+
 	public MessageDefinition getMessage() {
 		return message;
 	}
 
 	public String getMethodName() {
 		return methodName;
+	}
+
+	public byte[] toBytes() throws IOException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		write(dos);
+		dos.close();
+		return bos.toByteArray();
+	}
+
+	public void write(DataOutputStream dos) throws IOException {
+		MessageUtils.writeString(dos, methodName);
+		message.write(dos);
 	}
 }

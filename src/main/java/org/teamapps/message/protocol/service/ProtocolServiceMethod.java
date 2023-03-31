@@ -20,6 +20,9 @@
 package org.teamapps.message.protocol.service;
 
 import org.teamapps.message.protocol.message.MessageDefinition;
+import org.teamapps.message.protocol.utils.MessageUtils;
+
+import java.io.*;
 
 public class ProtocolServiceMethod {
 
@@ -33,6 +36,16 @@ public class ProtocolServiceMethod {
 		this.outputMessage = outputMessage;
 	}
 
+	public ProtocolServiceMethod(byte[] bytes) throws IOException {
+		this(new DataInputStream(new ByteArrayInputStream(bytes)));
+	}
+
+	public ProtocolServiceMethod(DataInputStream dis) throws IOException {
+		this.methodName = MessageUtils.readString(dis);
+		this.inputMessage = new MessageDefinition(dis);
+		this.outputMessage = new MessageDefinition(dis);
+	}
+
 	public MessageDefinition getInputMessage() {
 		return inputMessage;
 	}
@@ -43,5 +56,19 @@ public class ProtocolServiceMethod {
 
 	public String getMethodName() {
 		return methodName;
+	}
+
+	public byte[] toBytes() throws IOException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		write(dos);
+		dos.close();
+		return bos.toByteArray();
+	}
+
+	public void write(DataOutputStream dos) throws IOException {
+		MessageUtils.writeString(dos, methodName);
+		inputMessage.write(dos);
+		outputMessage.write(dos);
 	}
 }

@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MessageModelRegistry implements ModelRegistry, PojoObjectDecoderRegistry {
+public class MessageModelRegistry implements ModelRegistry {
 
 	private Map<String, List<MessageModel>> modelsByObjectUuid = new ConcurrentHashMap<>();
 	private Map<String, MessageModel> latestModelByObjectUuid = new ConcurrentHashMap<>();
