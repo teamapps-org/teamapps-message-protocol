@@ -36,7 +36,7 @@ import java.io.*;
 import java.time.*;
 import java.util.*;
 
-public class Message {
+public class Message implements MessageRecord {
 
 	private final MessageModel messageModel;
 	private final List<MessageAttribute> attributes = new ArrayList<>();
@@ -50,7 +50,7 @@ public class Message {
 		this.messageModel = messageModel;
 	}
 
-	public Message(Message message, ModelCollection modelCollection) {
+	public Message(MessageRecord message, ModelCollection modelCollection) {
 		this.messageModel = modelCollection.getModel(message.getMessageDefUuid());
 		for (MessageAttribute attribute : message.getAttributes()) {
 			AttributeDefinition remappedDefinition = messageModel.getAttributeDefinitionByKey(attribute.getAttributeDefinition().getKey());
@@ -195,18 +195,22 @@ public class Message {
 		return this;
 	}
 
+	@Override
 	public MessageModel getModel() {
 		return messageModel;
 	}
 
+	@Override
 	public String getMessageDefUuid() {
 		return messageModel.getObjectUuid();
 	}
 
+	@Override
 	public String getMessageDefName() {
 		return messageModel.getName();
 	}
 
+	@Override
 	public List<MessageAttribute> getAttributes() {
 		return attributes;
 	}
@@ -228,14 +232,17 @@ public class Message {
 		}
 	}
 
+	@Override
 	public byte[] toBytes() throws IOException {
 		return toBytes(null);
 	}
 
+	@Override
 	public byte[] toBytes(FileDataWriter fileDataWriter) throws IOException {
 		return toBytes(fileDataWriter, false);
 	}
 
+	@Override
 	public byte[] toBytes(FileDataWriter fileDataWriter, boolean updateFileData) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -244,6 +251,7 @@ public class Message {
 		return bos.toByteArray();
 	}
 
+	@Override
 	public String toXml() throws IOException  {
 		return toXml(false, null);
 	}
@@ -713,6 +721,7 @@ public class Message {
 		}
 	}
 
+	@Override
 	public int getRecordId() {
 		MessageAttribute property = getAttribute(MessageDefinition.META_RECORD_ID);
 		if (property != null) {
@@ -834,6 +843,7 @@ public class Message {
 		}
 	}
 
+	@Override
 	public MessageAttribute getAttribute(String name) {
 		return attributesByName.get(name);
 	}
