@@ -50,7 +50,7 @@ public class {type} extends Message {
 		}
 
 		@Override
-		public {type} remap(Message message) {
+		public {type} remap(MessageRecord message) {
 			return new {type}(message, {schema}.MODEL_COLLECTION);
 		}
 
@@ -72,7 +72,7 @@ public class {type} extends Message {
 		return {schema}.MODEL_COLLECTION;
 	}
 
-    public static {type} remap(Message message) {
+    public static {type} remap(MessageRecord message) {
         return new {type}(message, {schema}.MODEL_COLLECTION);
     }
 
@@ -83,7 +83,7 @@ public class {type} extends Message {
 		super({schema}.MODEL_COLLECTION.getModel(OBJECT_UUID));
 	}
 
-	public {type}(Message message, ModelCollection modelCollection) {
+	public {type}(MessageRecord message, ModelCollection modelCollection) {
 		super(message, modelCollection);
 	}
 
