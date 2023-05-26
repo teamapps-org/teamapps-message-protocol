@@ -383,6 +383,30 @@ public class MessagePojoBuilder {
 						.append("}\n\n");
 			}
 
+			if (propDef.getType() == AttributeType.STRING_ARRAY) {
+				data.append(getTabs(1))
+						.append("public List<String> get")
+						.append(firstUpperCase(propDef.getName())).append("AsList").append("() {\n")
+						.append(getTabs(2))
+						.append("return getStringArrayAsList").append("(")
+						.append(withQuotes(propDef.getName())).append(");\n")
+						.append(getTabs(1))
+						.append("}\n\n");
+
+				data.append(getTabs(1))
+						.append("public ")
+						.append(firstUpperCase(model.getName())).append(" ")
+						.append("set")
+						.append(firstUpperCase(propDef.getName())).append("AsList(List<String> value) {\n")
+						.append(getTabs(2))
+						.append("setStringArrayAsList(")
+						.append(withQuotes(propDef.getName())).append(", value);\n")
+						.append(getTabs(2))
+						.append("return this;\n")
+						.append(getTabs(1))
+						.append("}\n\n");
+			}
+
 			if (propDef.getType() == AttributeType.OBJECT_MULTI_REFERENCE) {
 				data.append(getTabs(1))
 						.append("public ")
