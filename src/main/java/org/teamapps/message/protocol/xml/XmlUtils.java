@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,12 +38,13 @@ public class XmlUtils {
 
 	public static Element readChildElement(Element element, String childName) {
 		NodeList elements = element.getElementsByTagName(childName);
-		if (elements.getLength() == 1) {
-			Node node = elements.item(0);
-			return (Element) node;
-		} else {
-			return null;
+		for (int i = 0; i < elements.getLength(); i++) {
+			Node node = elements.item(i);
+			if (node.getParentNode().isSameNode(element)) {
+				return (Element) node;
+			}
 		}
+		return null;
 	}
 
 	public static List<Element> readChildrenElements(Element element, String name) {
@@ -52,7 +52,10 @@ public class XmlUtils {
 		if (elements.getLength() > 0) {
 			List<Element> list = new ArrayList<>();
 			for (int i = 0; i < elements.getLength(); i++) {
-				list.add((Element) elements.item(i));
+				Element node = (Element) elements.item(i);
+				if (node.getParentNode().isSameNode(element)) {
+					list.add(node);
+				}
 			}
 			return list;
 		} else {
@@ -197,7 +200,7 @@ public class XmlUtils {
 		return value == 0 ? null : LocalTime.ofSecondOfDay(value);
 	}
 
-	public static Message readGenericMessage(Element element, FileDataReader fileDataReader)  {
+	public static Message readGenericMessage(Element element, FileDataReader fileDataReader) {
 		String base64 = readString(element);
 		if (base64 == null) {
 			return null;
