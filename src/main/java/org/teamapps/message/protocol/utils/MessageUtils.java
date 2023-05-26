@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 public class MessageUtils {
 
@@ -450,6 +452,29 @@ public class MessageUtils {
 			stringArray[i] = readString(buf);
 		}
 		return stringArray;
+	}
+
+	public static void writeStringList(DataOutputStream dos, List<String> list) throws IOException {
+		if (list == null || list.isEmpty()) {
+			dos.writeInt(0);
+		} else {
+			dos.writeInt(list.size());
+			for (String value : list) {
+				writeString(dos, value);
+			}
+		}
+	}
+
+	public static List<String> readStringList(DataInputStream dis) throws IOException {
+		int length = dis.readInt();
+		if (length == 0) {
+			return null;
+		}
+		List<String> list = new ArrayList<>();
+		for (int i = 0; i < length; i++) {
+			list.add(readString(dis));
+		}
+		return list;
 	}
 
 	public static Instant readInstant32(DataInputStream dis) throws IOException {

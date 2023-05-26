@@ -71,6 +71,10 @@ public class MessageModelCollection implements ModelCollection {
 		this.version = version;
 	}
 
+	public MessageDefinition createModel(String name) {
+		return createModel(name, name, true);
+	}
+
 	public MessageDefinition createModel(String name, String uuid) {
 		return createModel(name, uuid, true);
 	}

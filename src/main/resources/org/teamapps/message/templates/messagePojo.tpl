@@ -46,7 +46,7 @@ public class {type} extends Message {
 
 		@Override
 		public {type} defaultMessage() {
-			return ({type}) new {type}().setDefaultValues();
+			return ({type}) new {type}().setDefaultValues({schema}.MODEL_COLLECTION);
 		}
 
 		@Override

@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,10 @@
 package org.teamapps.message.protocol.message;
 
 
-import org.teamapps.message.protocol.file.*;
+import org.teamapps.message.protocol.file.FileData;
+import org.teamapps.message.protocol.file.FileDataReader;
+import org.teamapps.message.protocol.file.FileDataType;
+import org.teamapps.message.protocol.file.FileDataWriter;
 import org.teamapps.message.protocol.model.*;
 import org.teamapps.message.protocol.utils.MessageUtils;
 import org.teamapps.message.protocol.xml.XmlBuilder;
@@ -41,10 +44,6 @@ public class Message implements MessageRecord {
 	private final MessageModel messageModel;
 	private final List<MessageAttribute> attributes = new ArrayList<>();
 	private final Map<String, MessageAttribute> attributesByName = new HashMap<>();
-
-	public static String readMessageUuid(byte[] bytes) throws IOException {
-		return MessageUtils.readString(bytes, 0);
-	}
 
 	public Message(MessageModel messageModel) {
 		this.messageModel = messageModel;
@@ -118,13 +117,6 @@ public class Message implements MessageRecord {
 		}
 	}
 
-	public static Message readXml(String xml, MessageModel model, FileDataReader fileDataReader, PojoObjectDecoderRegistry decoderRegistry) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.parse(new InputSource(new StringReader(xml)));
-		return new Message(document.getDocumentElement(), model, fileDataReader, decoderRegistry);
-	}
-
 	public Message(String xml, MessageModel model, FileDataReader fileDataReader, PojoObjectDecoderRegistry decoderRegistry) throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -141,7 +133,7 @@ public class Message implements MessageRecord {
 		}
 	}
 
-	public Message(Element xmlNode, MessageModel model, FileDataReader fileDataReader, PojoObjectDecoderRegistry decoderRegistry)  {
+	public Message(Element xmlNode, MessageModel model, FileDataReader fileDataReader, PojoObjectDecoderRegistry decoderRegistry) {
 		this.messageModel = model;
 		for (AttributeDefinition definition : this.messageModel.getAttributeDefinitions()) {
 			Element childElement = XmlUtils.readChildElement(xmlNode, definition.getName());
@@ -153,41 +145,68 @@ public class Message implements MessageRecord {
 		}
 	}
 
-	protected Message setDefaultValues() {
-		for (AttributeDefinition attributeDefinition : messageModel.getAttributeDefinitions()) {
-			String s = attributeDefinition.getDefaultValue();
-			if (s != null) {
-				String name = attributeDefinition.getName();
-				switch (attributeDefinition.getType()) {
-					case BOOLEAN -> setBooleanAttribute(name, s.equals("1") || s.equals("true"));
-					case BYTE -> setByteAttribute(name, (byte) Integer.parseInt(s));
-					case INT, ENUM -> setIntAttribute(name, Integer.parseInt(s));
-					case LONG -> setLongAttribute(name, Long.parseLong(s));
-					case FLOAT -> setFloatAttribute(name, Float.parseFloat(s));
-					case DOUBLE -> setDoubleAttribute(name, Double.parseDouble(s));
-					case STRING -> setStringAttribute(name, s);
-					case BITSET -> {
-					}
-					case BYTE_ARRAY -> setByteArrayAttribute(name, Base64.getDecoder().decode(s));
-					case INT_ARRAY -> {
-					}
-					case LONG_ARRAY -> {
-					}
-					case FLOAT_ARRAY -> {
-					}
-					case DOUBLE_ARRAY -> {
-					}
-					case STRING_ARRAY -> {
-					}
-					case FILE -> {
-					}
-					case TIMESTAMP_32 -> setTimestampAttribute(name, Instant.ofEpochSecond(Integer.parseInt(s)));
-					case TIMESTAMP_64 -> setTimestampAttribute(name, Instant.ofEpochMilli(Long.parseLong(s)));
-					case DATE_TIME -> setDateTimeAttribute(name, LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(s)), ZoneOffset.UTC));
-					case DATE -> setDateAttribute(name, LocalDate.ofEpochDay(Long.parseLong(s)));
-					case TIME -> setTimeAttribute(name, LocalTime.ofSecondOfDay(Integer.parseInt(s)));
-					case GENERIC_MESSAGE -> {
+	public static String readMessageUuid(byte[] bytes) throws IOException {
+		return MessageUtils.readString(bytes, 0);
+	}
 
+	public static Message readXml(String xml, MessageModel model, FileDataReader fileDataReader, PojoObjectDecoderRegistry decoderRegistry) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.parse(new InputSource(new StringReader(xml)));
+		return new Message(document.getDocumentElement(), model, fileDataReader, decoderRegistry);
+	}
+
+	protected Message setDefaultValues() {
+		return setDefaultValues(null);
+	}
+
+	protected Message setDefaultValues(ModelCollection modelCollection) {
+		for (AttributeDefinition attributeDefinition : messageModel.getAttributeDefinitions()) {
+			String name = attributeDefinition.getName();
+			if (attributeDefinition.isReferenceProperty()) {
+				String refUuid = attributeDefinition.getReferencedObject().getObjectUuid();
+				if (modelCollection != null && modelCollection.containsDecoder(refUuid)) {
+					Message defaultMessage = modelCollection.getMessageDecoder(attributeDefinition.getReferencedObject().getObjectUuid()).defaultMessage();
+					if (attributeDefinition.isMultiReference()) {
+						setReferencedObjects(name, new ArrayList<>(Collections.singletonList(defaultMessage)));
+					} else {
+						setReferencedObject(name, defaultMessage);
+					}
+				}
+			} else {
+				String s = attributeDefinition.getDefaultValue();
+				if (s != null) {
+					switch (attributeDefinition.getType()) {
+						case BOOLEAN -> setBooleanAttribute(name, s.equals("1") || s.equals("true"));
+						case BYTE -> setByteAttribute(name, (byte) Integer.parseInt(s));
+						case INT, ENUM -> setIntAttribute(name, Integer.parseInt(s));
+						case LONG -> setLongAttribute(name, Long.parseLong(s));
+						case FLOAT -> setFloatAttribute(name, Float.parseFloat(s));
+						case DOUBLE -> setDoubleAttribute(name, Double.parseDouble(s));
+						case STRING -> setStringAttribute(name, s);
+						case BITSET -> {
+						}
+						case BYTE_ARRAY -> setByteArrayAttribute(name, Base64.getDecoder().decode(s));
+						case INT_ARRAY -> {
+						}
+						case LONG_ARRAY -> {
+						}
+						case FLOAT_ARRAY -> {
+						}
+						case DOUBLE_ARRAY -> {
+						}
+						case STRING_ARRAY -> {
+						}
+						case FILE -> {
+						}
+						case TIMESTAMP_32 -> setTimestampAttribute(name, Instant.ofEpochSecond(Integer.parseInt(s)));
+						case TIMESTAMP_64 -> setTimestampAttribute(name, Instant.ofEpochMilli(Long.parseLong(s)));
+						case DATE_TIME -> setDateTimeAttribute(name, LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(s)), ZoneOffset.UTC));
+						case DATE -> setDateAttribute(name, LocalDate.ofEpochDay(Long.parseLong(s)));
+						case TIME -> setTimeAttribute(name, LocalTime.ofSecondOfDay(Integer.parseInt(s)));
+						case GENERIC_MESSAGE -> {
+
+						}
 					}
 				}
 			}
@@ -217,6 +236,10 @@ public class Message implements MessageRecord {
 
 	public int getAttributeKey(String attributeName) {
 		return messageModel.getAttributeDefinitionByName(attributeName).getKey();
+	}
+
+	public void write(DataOutputStream dos) throws IOException {
+		write(dos, null);
 	}
 
 	public void write(DataOutputStream dos, FileDataWriter fileDataWriter) throws IOException {
@@ -252,7 +275,7 @@ public class Message implements MessageRecord {
 	}
 
 	@Override
-	public String toXml() throws IOException  {
+	public String toXml() throws IOException {
 		return toXml(false, null);
 	}
 
@@ -435,6 +458,12 @@ public class Message implements MessageRecord {
 		return this;
 	}
 
+	public Message setStringArrayAsList(String name, List<String> value) {
+		String[] v = value != null && !value.isEmpty() ? value.toArray(new String[0]) : null;
+		setAttribute(name, v);
+		return this;
+	}
+
 	public Message setTimestampAttribute(String name, Instant value) {
 		setAttribute(name, value);
 		return this;
@@ -497,6 +526,10 @@ public class Message implements MessageRecord {
 		} else {
 			return null;
 		}
+	}
+
+	public boolean isEmpty(String propertyName) {
+		return getAttribute(propertyName) == null;
 	}
 
 
@@ -676,6 +709,15 @@ public class Message implements MessageRecord {
 		}
 	}
 
+	public List<String> getStringArrayAsList(String propertyName) {
+		MessageAttribute property = getAttribute(propertyName);
+		if (property != null) {
+			return Arrays.asList(property.getStringArrayAttribute());
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
 	public Instant getTimestampAttribute(String propertyName) {
 		MessageAttribute property = getAttribute(propertyName);
 		if (property != null) {
@@ -814,6 +856,9 @@ public class Message implements MessageRecord {
 	}
 
 	public void setAttribute(String name, Object value) {
+		if (value == null && isEmpty(name)) {
+			return;
+		}
 		AttributeDefinition attributeDefinition = messageModel.getAttributeDefinitionByName(name);
 		if (attributeDefinition == null) {
 			throw new RuntimeException("Message model does not contain a field with name:" + name);

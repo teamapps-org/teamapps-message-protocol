@@ -22,6 +22,7 @@ package org.teamapps.message.protocol.model;
 
 import org.teamapps.message.protocol.message.AttributeType;
 import org.teamapps.message.protocol.message.DefinitionCache;
+import org.teamapps.message.protocol.message.MessageDefinition;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,15 +38,7 @@ public interface AttributeDefinition extends BaseDefinition {
 
 	AttributeType getType();
 
-	boolean isReferenceProperty();
-
 	MessageModel getReferencedObject();
-
-	boolean isMultiReference();
-
-	boolean isEnumProperty();
-
-	boolean isMetaDataField();
 
 	EnumDefinition getEnumDefinition();
 
@@ -56,4 +49,20 @@ public interface AttributeDefinition extends BaseDefinition {
 	byte[] toBytes() throws IOException;
 
 	String explain(int level, Set<String> printedObjects);
+
+	default boolean isReferenceProperty() {
+		return getType() == AttributeType.OBJECT_SINGLE_REFERENCE || getType() == AttributeType.OBJECT_MULTI_REFERENCE;
+	}
+
+	default boolean isMultiReference() {
+		return getType() == AttributeType.OBJECT_MULTI_REFERENCE;
+	}
+
+	default boolean isEnumProperty() {
+		return getType() == AttributeType.ENUM;
+	}
+
+	default boolean isMetaDataField() {
+		return MessageDefinition.META_FIELD_NAMES.contains(getName());
+	}
 }

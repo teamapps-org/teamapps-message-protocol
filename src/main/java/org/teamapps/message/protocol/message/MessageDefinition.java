@@ -19,6 +19,7 @@
  */
 package org.teamapps.message.protocol.message;
 
+import org.teamapps.message.protocol.model.ExtendedAttributesUpdater;
 import org.teamapps.message.protocol.model.MessageModel;
 import org.teamapps.message.protocol.utils.MessageUtils;
 import org.teamapps.message.protocol.model.AttributeDefinition;
@@ -32,10 +33,10 @@ import java.util.stream.Stream;
 public class MessageDefinition implements MessageModel {
 
 	public static final String META_RECORD_ID = "recordId";
-	public final static String META_CREATION_DATE = "creationDate";
-	public final static String META_CREATED_BY = "createdBy";
-	public final static String META_MODIFICATION_DATE = "modificationDate";
-	public final static String META_MODIFIED_BY = "modifiedBy";
+	public final static String META_CREATION_DATE = "recordCreationDate";
+	public final static String META_CREATED_BY = "recordCreatedBy";
+	public final static String META_MODIFICATION_DATE = "recordModificationDate";
+	public final static String META_MODIFIED_BY = "recordModifiedBy";
 
 	public final static Set<String> META_FIELD_NAMES = Stream.of(META_RECORD_ID, META_CREATION_DATE, META_CREATED_BY, META_MODIFICATION_DATE, META_MODIFIED_BY).collect(Collectors.toSet());
 	public final static Set<String> RESERVED_NAMES_LOWER_CASE = Stream.of(META_RECORD_ID, META_CREATION_DATE, META_CREATED_BY, META_MODIFICATION_DATE, META_MODIFIED_BY).map(String::toLowerCase).collect(Collectors.toSet());
@@ -147,133 +148,138 @@ public class MessageDefinition implements MessageModel {
 		return objectUuid;
 	}
 
-	public void addBoolean(String name, int key) {
-		addAttribute(name, key, AttributeType.BOOLEAN);
+	public ExtendedAttributesUpdater addBoolean(String name, int key) {
+		return addAttribute(name, key, AttributeType.BOOLEAN);
 	}
 
-	public void addByte(String name, int key) {
-		addAttribute(name, key, AttributeType.BYTE);
+	public ExtendedAttributesUpdater addByte(String name, int key) {
+		return addAttribute(name, key, AttributeType.BYTE);
 	}
 
-	public void addString(String name, int key) {
-		addAttribute(name, key, AttributeType.STRING);
+	public ExtendedAttributesUpdater addString(String name, int key) {
+		return addAttribute(name, key, AttributeType.STRING);
 	}
 
-	public void addInteger(String name, int key) {
-		addAttribute(name, key, AttributeType.INT);
+	public ExtendedAttributesUpdater addInteger(String name, int key) {
+		return addAttribute(name, key, AttributeType.INT);
 	}
 
-	public void addLong(String name, int key) {
-		addAttribute(name, key, AttributeType.LONG);
+	public ExtendedAttributesUpdater addLong(String name, int key) {
+		return addAttribute(name, key, AttributeType.LONG);
 	}
 
-	public void addFloat(String name, int key) {
-		addAttribute(name, key, AttributeType.FLOAT);
+	public ExtendedAttributesUpdater addFloat(String name, int key) {
+		return addAttribute(name, key, AttributeType.FLOAT);
 	}
 
-	public void addDouble(String name, int key) {
-		addAttribute(name, key, AttributeType.DOUBLE);
+	public ExtendedAttributesUpdater addDouble(String name, int key) {
+		return addAttribute(name, key, AttributeType.DOUBLE);
 	}
 
-	public void addFile(String name, int key) {
-		addAttribute(name, key, AttributeType.FILE);
+	public ExtendedAttributesUpdater addFile(String name, int key) {
+		return addAttribute(name, key, AttributeType.FILE);
 	}
 
-	public void addByteArray(String name, int key) {
-		addAttribute(name, key, AttributeType.BYTE_ARRAY);
+	public ExtendedAttributesUpdater addByteArray(String name, int key) {
+		return addAttribute(name, key, AttributeType.BYTE_ARRAY);
 	}
 
-	public void addIntArray(String name, int key) {
-		addAttribute(name, key, AttributeType.INT_ARRAY);
+	public ExtendedAttributesUpdater addIntArray(String name, int key) {
+		return addAttribute(name, key, AttributeType.INT_ARRAY);
 	}
 
-	public void addLongArray(String name, int key) {
-		addAttribute(name, key, AttributeType.LONG_ARRAY);
+	public ExtendedAttributesUpdater addLongArray(String name, int key) {
+		return addAttribute(name, key, AttributeType.LONG_ARRAY);
 	}
 
-	public void addFloatArray(String name, int key) {
-		addAttribute(name, key, AttributeType.FLOAT_ARRAY);
+	public ExtendedAttributesUpdater addFloatArray(String name, int key) {
+		return addAttribute(name, key, AttributeType.FLOAT_ARRAY);
 	}
 
-	public void addDoubleArray(String name, int key) {
-		addAttribute(name, key, AttributeType.DOUBLE_ARRAY);
+	public ExtendedAttributesUpdater addDoubleArray(String name, int key) {
+		return addAttribute(name, key, AttributeType.DOUBLE_ARRAY);
 	}
 
-	public void addStringArray(String name, int key) {
-		addAttribute(name, key, AttributeType.STRING_ARRAY);
+	public ExtendedAttributesUpdater addStringArray(String name, int key) {
+		return addAttribute(name, key, AttributeType.STRING_ARRAY);
 	}
 
-	public void addTimestamp(String name, int key) {
-		addAttribute(name, key, AttributeType.TIMESTAMP_32);
+	public ExtendedAttributesUpdater addTimestamp(String name, int key) {
+		return addAttribute(name, key, AttributeType.TIMESTAMP_32);
 	}
 
-	public void addLongTimestamp(String name, int key) {
-		addAttribute(name, key, AttributeType.TIMESTAMP_64);
+	public ExtendedAttributesUpdater addLongTimestamp(String name, int key) {
+		return addAttribute(name, key, AttributeType.TIMESTAMP_64);
 	}
 
-	public void addDateTime(String name, int key) {
-		addAttribute(name, key, AttributeType.DATE_TIME);
+	public ExtendedAttributesUpdater addDateTime(String name, int key) {
+		return addAttribute(name, key, AttributeType.DATE_TIME);
 	}
 
-	public void addDate(String name, int key) {
-		addAttribute(name, key, AttributeType.DATE);
+	public ExtendedAttributesUpdater addDate(String name, int key) {
+		return addAttribute(name, key, AttributeType.DATE);
 	}
 
-	public void addTime(String name, int key) {
-		addAttribute(name, key, AttributeType.TIME);
+	public ExtendedAttributesUpdater addTime(String name, int key) {
+		return addAttribute(name, key, AttributeType.TIME);
 	}
 
-	public void addEnum(String name, EnumDefinition enumDefinition, int key) {
-		addEnum(name, enumDefinition, key, null);
+	public ExtendedAttributesUpdater addEnum(String name, EnumDefinition enumDefinition, int key) {
+		return addEnum(name, enumDefinition, key, null);
 	}
 
-	public void addEnum(String name, EnumDefinition enumDefinition, int key, Message specificType) {
+	public ExtendedAttributesUpdater addEnum(String name, EnumDefinition enumDefinition, int key, Message specificType) {
 		AbstractAttributeDefinition attributeDefinition = new AbstractAttributeDefinition(this, name, key, enumDefinition, specificType);
 		addAttribute(attributeDefinition);
+		return attributeDefinition;
 	}
 
-	public void addAttribute(String name, int key, AttributeType type) {
-		addAttribute(name, key, type, null);
+	public ExtendedAttributesUpdater addAttribute(String name, int key, AttributeType type) {
+		return addAttribute(name, key, type, null);
 	}
 
-	public void addAttribute(String name, int key, AttributeType type, Message specificType) {
+	public ExtendedAttributesUpdater addAttribute(String name, int key, AttributeType type, Message specificType) {
 		AbstractAttributeDefinition attributeDefinition = new AbstractAttributeDefinition(this, name, key, type, specificType);
 		addAttribute(attributeDefinition);
+		return attributeDefinition;
 	}
 
-	public void addAttribute(String name, int key, AttributeType type, Message specificType, String defaultValue, String comment) {
+	public ExtendedAttributesUpdater addAttribute(String name, int key, AttributeType type, Message specificType, String defaultValue, String comment) {
 		AbstractAttributeDefinition attributeDefinition = new AbstractAttributeDefinition(this, name, key, type, specificType, defaultValue, comment);
 		addAttribute(attributeDefinition);
+		return attributeDefinition;
 	}
 
-	public void addSingleReference(String name, MessageDefinition referencedObject, int key) {
-		addSingleReference(name, key, null, referencedObject);
+	public ExtendedAttributesUpdater addSingleReference(String name, MessageDefinition referencedObject, int key) {
+		return addSingleReference(name, key, null, referencedObject);
 	}
 
-	public void addSingleReference(String name, int key, MessageDefinition referencedObject) {
-		addSingleReference(name, key, null, referencedObject);
+	public ExtendedAttributesUpdater addSingleReference(String name, int key, MessageDefinition referencedObject) {
+		return addSingleReference(name, key, null, referencedObject);
 	}
 
-	public void addSingleReference(String name, int key, Message specificType, MessageDefinition referencedObject) {
+	public ExtendedAttributesUpdater addSingleReference(String name, int key, Message specificType, MessageDefinition referencedObject) {
 		AbstractAttributeDefinition referenceAttributeDefinition = new AbstractAttributeDefinition(this, name, key, specificType, referencedObject, false);
 		addAttribute(referenceAttributeDefinition);
+		return referenceAttributeDefinition;
 	}
 
-	public void addMultiReference(String name, MessageDefinition referencedObject,  int key) {
-		addMultiReference(name, key, null, referencedObject);
+	public ExtendedAttributesUpdater addMultiReference(String name, MessageDefinition referencedObject,  int key) {
+		return addMultiReference(name, key, null, referencedObject);
 	}
 
-	public void addMultiReference(String name, int key, MessageDefinition referencedObject) {
-		addMultiReference(name, key, null, referencedObject);
+	public ExtendedAttributesUpdater addMultiReference(String name, int key, MessageDefinition referencedObject) {
+		return addMultiReference(name, key, null, referencedObject);
 	}
 
-	public void addMultiReference(String name, int key, Message specificType, MessageDefinition referencedObject) {
+	public ExtendedAttributesUpdater addMultiReference(String name, int key, Message specificType, MessageDefinition referencedObject) {
 		AbstractAttributeDefinition referenceAttributeDefinition = new AbstractAttributeDefinition(this, name, key, specificType, referencedObject, true);
 		addAttribute(referenceAttributeDefinition);
+		return referenceAttributeDefinition;
 	}
 
-	public void addGenericMessage(String name, int key) {
-		addAttribute(name, key, AttributeType.GENERIC_MESSAGE);
+	public ExtendedAttributesUpdater addGenericMessage(String name, int key) {
+		return addAttribute(name, key, AttributeType.GENERIC_MESSAGE);
 	}
 
 	public void addAttribute(AttributeDefinition field) {

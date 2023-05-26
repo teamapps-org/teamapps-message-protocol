@@ -25,8 +25,12 @@ public interface BaseDefinition {
 
 	String getName();
 
+//	String getTitle();
+
 	Message getSpecificType();
 
 	String getComment();
+
+//	String getDefaultValue();
 
 }

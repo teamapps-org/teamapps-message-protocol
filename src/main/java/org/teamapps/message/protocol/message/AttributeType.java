@@ -47,6 +47,7 @@ public enum AttributeType {
 	DATE(23),
 	TIME(24),
 	GENERIC_MESSAGE(25),
+	//MAP(26), todo
 	;
 
 	private final int id;
@@ -84,13 +85,13 @@ public enum AttributeType {
 			case 17 -> STRING_ARRAY;
 			case 18 -> FILE;
 			case 19 -> ENUM;
-
 			case 20 -> TIMESTAMP_32;
 			case 21 -> TIMESTAMP_64;
 			case 22 -> DATE_TIME;
 			case 23 -> DATE;
 			case 24 -> TIME;
 			case 25 -> GENERIC_MESSAGE;
+			//case 26 -> MAP;
 			default -> null;
 		};
 	}

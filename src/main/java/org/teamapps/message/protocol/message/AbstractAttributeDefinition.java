@@ -22,6 +22,7 @@ package org.teamapps.message.protocol.message;
 
 import org.teamapps.message.protocol.model.AttributeDefinition;
 import org.teamapps.message.protocol.model.EnumDefinition;
+import org.teamapps.message.protocol.model.ExtendedAttributesUpdater;
 import org.teamapps.message.protocol.model.MessageModel;
 import org.teamapps.message.protocol.utils.MessageUtils;
 
@@ -31,16 +32,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AbstractAttributeDefinition implements AttributeDefinition {
+public class AbstractAttributeDefinition implements AttributeDefinition, ExtendedAttributesUpdater {
 	private final MessageModel parent;
 	private final String name;
 	private final int key;
 	private final AttributeType type;
-	private final String defaultValue;
-	private final String comment;
-	private final Message specificType;
+	private String defaultValue;
+	private String comment;
+	private Message specificType;
 	private final MessageModel referencedObject;
-	private final boolean multiReference;
 	private final EnumDefinition enumDefinition;
 
 	public AbstractAttributeDefinition(MessageModel parent, String name, int key, AttributeType type, Message specificType){
@@ -56,7 +56,6 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.defaultValue = defaultValue;
 		this.comment = comment;
 		this.referencedObject = null;
-		this.multiReference = false;
 		this.enumDefinition = null;
 	}
 
@@ -73,7 +72,6 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.defaultValue = defaultValue;
 		this.comment = comment;
 		this.referencedObject = null;
-		this.multiReference = false;
 		this.enumDefinition = enumDefinition;
 	}
 
@@ -90,7 +88,6 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.defaultValue = null;
 		this.comment = comment;
 		this.referencedObject = referencedObject;
-		this.multiReference = multiReference;
 		this.enumDefinition = null;
 	}
 
@@ -108,7 +105,6 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		this.comment = MessageUtils.readString(dis);
 
 		if (type == AttributeType.OBJECT_SINGLE_REFERENCE || type == AttributeType.OBJECT_MULTI_REFERENCE) {
-			this.multiReference = dis.readBoolean();
 			if (dis.readBoolean()) {
 				String objectUuid = MessageUtils.readString(dis);
 				this.referencedObject = definitionCache.getModel(objectUuid);
@@ -131,11 +127,9 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 				definitionCache.addEnum(this.enumDefinition);
 			}
 			this.referencedObject = null;
-			this.multiReference = false;
 		} else {
 			this.enumDefinition = null;
 			this.referencedObject = null;
-			this.multiReference = false;
 		}
 	}
 
@@ -151,7 +145,6 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		MessageUtils.writeString(dos, defaultValue);
 		MessageUtils.writeString(dos, comment);
 		if (isReferenceProperty()) {
-			dos.writeBoolean(multiReference);
 			if (definitionCache.containsModel(referencedObject)) {
 				dos.writeBoolean(true);
 				MessageUtils.writeString(dos, referencedObject.getObjectUuid());
@@ -175,6 +168,21 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 				definitionCache.addEnum(enumDefinition);
 			}
 		}
+	}
+
+	public ExtendedAttributesUpdater setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+		return this;
+	}
+
+	public ExtendedAttributesUpdater setComment(String comment) {
+		this.comment = comment;
+		return this;
+	}
+
+	public ExtendedAttributesUpdater setSpecificType(Message specificType) {
+		this.specificType = specificType;
+		return this;
 	}
 
 	@Override
@@ -221,20 +229,7 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		return defaultValue;
 	}
 
-	@Override
-	public boolean isReferenceProperty() {
-		return type == AttributeType.OBJECT_SINGLE_REFERENCE || type == AttributeType.OBJECT_MULTI_REFERENCE;
-	}
 
-	@Override
-	public boolean isEnumProperty() {
-		return type == AttributeType.ENUM;
-	}
-
-	@Override
-	public boolean isMetaDataField() {
-		return MessageDefinition.META_FIELD_NAMES.contains(name);
-	}
 
 	@Override
 	public EnumDefinition getEnumDefinition() {
@@ -246,10 +241,6 @@ public class AbstractAttributeDefinition implements AttributeDefinition {
 		return referencedObject;
 	}
 
-	@Override
-	public boolean isMultiReference() {
-		return multiReference;
-	}
 
 	@Override
 	public String explain(int level, Set<String> printedObjects) {
