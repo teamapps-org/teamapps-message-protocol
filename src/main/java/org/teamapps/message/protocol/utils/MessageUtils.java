@@ -92,7 +92,7 @@ public class MessageUtils {
 	}
 
 	public static FileData writeFile(DataOutputStream dos, FileData fileData, FileDataWriter fileWriter) throws IOException {
-		if (fileData == null) {
+		if (fileData == null || fileData.getLength() == 0) {
 			dos.writeLong(0);
 			return null;
 		} else {
