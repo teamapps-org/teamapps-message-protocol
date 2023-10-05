@@ -292,7 +292,7 @@ public class MessagePojoBuilder {
 						.append(getReturnType(propDef)).append(" value) {\n")
 						.append(getTabs(2))
 						.append("set").append(getGetterSetterMethodName(propDef)).append("(")
-						.append(withQuotes(propDef.getName())).append(", value != null ? value.getId() : null);\n")
+						.append(withQuotes(propDef.getName())).append(", value != null ? value.getId() : 0);\n")
 						.append(getTabs(2))
 						.append("return this;\n")
 						.append(getTabs(1))
