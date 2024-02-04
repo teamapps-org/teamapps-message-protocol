@@ -43,6 +43,8 @@ public interface ModelCollection extends PojoObjectDecoderRegistry {
 
 	List<ServiceProtocol> getProtocolServiceSchemas();
 
+	String createModelCode();
+
 	void write(DataOutputStream dos) throws IOException;
 
 	byte[] toBytes() throws IOException;

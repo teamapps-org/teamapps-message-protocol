@@ -19,6 +19,7 @@
  */
 package org.teamapps.message.protocol.message;
 
+import org.teamapps.message.protocol.builder.MessagePojoBuilder;
 import org.teamapps.message.protocol.model.*;
 import org.teamapps.message.protocol.service.ServiceProtocol;
 import org.teamapps.message.protocol.utils.MessageUtils;
@@ -199,5 +200,14 @@ public class MessageModelCollection implements ModelCollection {
 		write(dos);
 		dos.close();
 		return bos.toByteArray();
+	}
+
+	@Override
+	public String createModelCode() {
+		try {
+			return MessagePojoBuilder.createSchemaCode(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -21,6 +21,7 @@ package org.teamapps.message.protocol.builder;
 
 import org.apache.commons.io.IOUtils;
 import org.teamapps.message.protocol.message.Message;
+import org.teamapps.message.protocol.message.MessageModelCollection;
 import org.teamapps.message.protocol.model.MessageModel;
 import org.teamapps.message.protocol.model.ModelCollection;
 import org.teamapps.message.protocol.message.AttributeType;
@@ -132,6 +133,94 @@ public class MessagePojoBuilder {
 			Files.writeString(file.toPath(), tpl);
 		}
 
+	}
+
+	public static String createSchemaCode(ModelCollection modelCollection) throws IOException {
+		String tpl = readTemplate("messageCollectionCode.tpl");
+		tpl = setValue(tpl, "name", modelCollection.getName());
+		tpl = setValue(tpl, "namespace", modelCollection.getNamespace());
+		tpl = setValue(tpl, "version", "" + modelCollection.getVersion());
+
+		StringBuilder data = new StringBuilder();
+
+		for (MessageModel model : modelCollection.getModels()) {
+			String objName = model.getName();
+			data.append(getTabs(2))
+					.append("MessageDefinition ")
+					.append(objName)
+					.append(" = model.createModel(")
+					.append(withQuotes(objName)).append(", ")
+					.append(withQuotes(model.getObjectUuid())).append(", ")
+					.append(model.getModelVersion()).append(", ")
+					.append(base64EncodedReader(model.getSpecificType())).append(", ")
+					.append("" + model.isMessageRecord())
+					.append(");\n");
+		}
+		data.append("\n");
+
+		for (EnumDefinition enumDefinition : modelCollection.getEnums()) {
+			String objName = enumDefinition.getName();
+			data.append(getTabs(2))
+					.append("EnumDefinition ")
+					.append(objName)
+					.append(" = model.createEnum(")
+					.append(withQuotes(objName)).append(", ");
+
+			for (int i = 0; i < enumDefinition.getEnumValues().size(); i++) {
+				String value = enumDefinition.getEnumValues().get(i);
+				if (i > 0) {
+					data.append(", ");
+				}
+				data.append(withQuotes(createConstantName(value)));
+			}
+			data.append(");\n");
+		}
+		data.append("\n");
+
+		for (MessageModel model : modelCollection.getModels()) {
+			String objName = model.getName();
+			for (AttributeDefinition propDef : model.getAttributeDefinitions()) {
+				if (model.isMessageRecord() && MessageDefinition.RESERVED_NAMES_LOWER_CASE.contains(propDef.getName().toLowerCase())) {
+					continue;
+				}
+				if (propDef.isReferenceProperty()) {
+					String method = propDef.getType() == AttributeType.OBJECT_SINGLE_REFERENCE ? "addSingleReference" : "addMultiReference";
+					data.append(getTabs(2))
+							.append(objName)
+							.append(".").append(method).append("(")
+							.append(withQuotes(propDef.getName())).append(", ")
+							.append(propDef.getKey()).append(", ")
+							.append(base64EncodedReader(propDef.getSpecificType())).append(", ")
+							.append(propDef.getReferencedObject().getName())
+							.append(");\n");
+
+				} else if (propDef.isEnumProperty()){
+					data.append(getTabs(2))
+							.append(objName)
+							.append(".addEnum(")
+							.append(withQuotes(propDef.getName())).append(", ")
+							.append(propDef.getEnumDefinition().getName()).append(", ")
+							.append(propDef.getKey()).append(", ")
+							.append(base64EncodedReader(propDef.getSpecificType()))
+							.append(");\n");
+				} else {
+					data.append(getTabs(2))
+							.append(objName)
+							.append(".addAttribute(")
+							.append(withQuotes(propDef.getName())).append(", ")
+							.append(propDef.getKey()).append(", ")
+							.append("AttributeType.").append(propDef.getType()).append(", ")
+							.append(base64EncodedReader(propDef.getSpecificType())).append(", ")
+							.append(propDef.getDefaultValue() != null ? withQuotes(propDef.getDefaultValue()) : null).append(", ")
+							.append(propDef.getComment() != null ? withQuotes(propDef.getComment()) : null)
+							.append(");\n");
+				}
+
+			}
+			data.append("\n");
+		}
+		tpl = setValue(tpl, "model", data.toString());
+		return tpl;
 	}
 
 	private static void createSchemaPojo(ModelCollection modelCollection, File directory) throws IOException {
