@@ -4,7 +4,7 @@
 
     <groupId>org.teamapps</groupId>
     <artifactId>teamapps-message-protocol</artifactId>
-    <version>0.17-SNAPSHOT</version>
+    <version>0.17</version>
 
     <name>TeamApps Message Protocol</name>
     <description>A TeamApps.org protocol and message definition framework</description>
@@ -46,7 +46,7 @@
         <url>https://github.com/teamapps-org/teamapps-message-protocol</url>
         <connection>scm:git:git@github.com:teamapps-org/teamapps-message-protocol</connection>
         <developerConnection>scm:git:git@github.com:teamapps-org/teamapps-message-protocol</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v0.17</tag>
     </scm>
 
     <dependencies>
